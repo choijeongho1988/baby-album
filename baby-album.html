@@ -115,6 +115,7 @@
     <div class="subtitle">사진을 올리면 <span class="heart">♥</span> 찍은 날짜별로 자동 정리돼요</div>
     <div class="toolbar">
       <button class="btn" id="addBtn">＋ 사진 추가</button>
+      <button class="btn" id="retryBtn" style="display:none;background:var(--yellow)">⟳ 실패분 다시 올리기</button>
       <button class="btn ghost" id="refreshBtn">🔄 새로고침</button>
       <button class="btn ghost" id="rescanBtn">📅 날짜 다시 읽기</button>
       <button class="btn ghost" id="syncBtn">☁ 구글 연결</button>
@@ -450,52 +451,79 @@ async function patchAlbumDate(id, date){
 }
 
 /* ---------- 사진 추가 ---------- */
+let pendingFailures = [];   // 업로드 실패한 파일들(다시 올리기용)
+let uploadBusy = false;
+
 document.getElementById("addBtn").onclick = ()=> document.getElementById("fileInput").click();
-document.getElementById("fileInput").onchange = async (e)=>{
+document.getElementById("fileInput").onchange = (e)=>{
   const files=[...e.target.files]; e.target.value="";
+  uploadFiles(files);
+};
+document.getElementById("retryBtn").onclick = ()=>{
+  if(!pendingFailures.length) return;
+  uploadFiles(pendingFailures.slice());
+};
+function showRetry(count){
+  const b=document.getElementById("retryBtn");
+  if(count>0){ b.textContent=`⟳ 실패분 다시 올리기 (${count})`; b.style.display="inline-flex"; }
+  else b.style.display="none";
+}
+
+// 한 장 업로드 → 성공 true / 실패 false
+async function uploadOne(f){
+  const det = await getPhotoDate(f);                 // {date, exif}
+  const tempId = "tmp_"+uid();
+  let localThumb=null, blob, mime, ext;
+  try{ blob = await compressToBlob(f, 1600, 0.82); mime="image/jpeg"; ext="jpg"; localThumb=URL.createObjectURL(blob); }
+  catch(_){ blob = f; mime = f.type || "application/octet-stream"; ext = (f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg"; }
+  photos.push({id:tempId, date:det.date, thumbBase:null, localThumb, uploading:true}); render();
+  try{
+    const up = await uploadWithRetry(blob, det.date+"_"+uid()+"."+ext, det.date, mime); // 촬영일 없으면 저장(다운로드)일 기록
+    const idx = photos.findIndex(p=>p.id===tempId);
+    if(idx>=0) photos[idx] = {id:up.id, date:(up.appProperties&&up.appProperties.albumDate)||det.date, thumbBase:up.thumbnailLink||null, localThumb};
+    render(); return true;
+  }catch(err){
+    photos = photos.filter(p=>p.id!==tempId); render(); return false;
+  }
+}
+
+// 여러 장 업로드 — 실패분은 자동으로 최대 3차까지 재시도, 그래도 남으면 '다시 올리기'로 보관
+function uploadFiles(input){
+  let files = (input||[]).filter(f=> f.type.startsWith("image/") || /\.(heic|heif|jpe?g|png|gif|webp)$/i.test(f.name));
   if(!files.length) return;
   if(!curFolderId()){ toast("이 앨범 폴더가 아직 설정되지 않았어요"); return; }
   if(!driveConnected()){ toast("먼저 '☁ 구글 연결'을 눌러주세요"); return; }
   if(!haveToken()){ toast("구글 연결이 만료됐어요 — '☁ 구글 연결' 다시 클릭"); setSync("구글 다시 연결 필요 — '☁ 구글 연결'","err"); return; }
-  const total = files.length;
+  if(uploadBusy){ toast("이미 업로드 중이에요 — 끝난 뒤 다시 시도해주세요"); return; }
+  uploadBusy = true; showRetry(0);
+  const totalAll = files.length;
   whenGoogleReady(async ()=>{
     try{ if(!folderId) await ensureFolder(); }catch(_){}
-    let done=0, failed=0;
-    for(let n=0;n<files.length;n++){
-      const f = files[n];
-      const isImg = f.type.startsWith("image/") || /\.(heic|heif|jpe?g|png|gif|webp)$/i.test(f.name);
-      if(!isImg) continue;
-      setSync(`올리는 중… ${done+failed+1}/${total}`);
-      const tempId = "tmp_"+uid();
-      let localThumb=null;
-      try{
-        const det = await getPhotoDate(f);                 // {date, exif}
-        // 변환 시도(실패하면 — HEIC 등 — 원본 그대로 업로드)
-        let blob, mime, ext;
-        try{ blob = await compressToBlob(f, 1600, 0.82); mime="image/jpeg"; ext="jpg"; localThumb=URL.createObjectURL(blob); }
-        catch(_){ blob = f; mime = f.type || "application/octet-stream"; ext = (f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg"; }
-        photos.push({id:tempId, date:det.date, thumbBase:null, localThumb, uploading:true}); render();
-        const fileName = det.date+"_"+uid()+"."+ext;
-        const up = await uploadWithRetry(blob, fileName, det.date, mime);  // EXIF 없으면 파일 저장일(다운로드일)이라도 기록
-        const idx = photos.findIndex(p=>p.id===tempId);
-        if(idx>=0) photos[idx] = {id:up.id, date: (up.appProperties&&up.appProperties.albumDate)||det.date, thumbBase:up.thumbnailLink||null, localThumb};
-        done++;
-      }catch(err){
-        failed++;
-        photos = photos.filter(p=>p.id!==tempId);  // 실패한 임시 항목만 제거
+    let done=0, queue=files;
+    for(let pass=0; pass<3 && queue.length; pass++){
+      if(pass>0){ setSync(`실패분 다시 시도(${pass}차)… ${queue.length}장 남음`); await sleep(2500); }
+      const next=[];
+      for(const f of queue){
+        setSync(`올리는 중… ${done+1}/${totalAll}`);
+        const ok = await uploadOne(f);
+        if(ok) done++; else next.push(f);
+        await sleep(90);
       }
-      render();
-      await sleep(120);  // 속도 제한 완화
+      queue = next;
     }
-    if(failed){
-      setSync(`완료 ${done}장 · 실패 ${failed}장 — 실패분은 다시 올리거나 드라이브에 직접 넣어주세요`, "err");
-      toast(`${done}장 완료, ${failed}장 실패`);
+    uploadBusy = false;
+    if(queue.length){
+      pendingFailures = queue;
+      showRetry(queue.length);
+      setSync(`완료 ${done}/${totalAll} · ${queue.length}장 실패 — '⟳ 실패분 다시 올리기'를 눌러주세요`, "err");
+      toast(`${queue.length}장 실패 — 다시 올리기로 재시도하세요`);
     }else{
+      pendingFailures = []; showRetry(0);
       setSync("구글 드라이브 연결됨 ✓","ok");
-      toast(`${done}장을 드라이브에 저장했어요 💕`);
+      toast(`${done}장 모두 올렸어요 💕`);
     }
   });
-};
+}
 async function flushPendingUploads(){ /* 현재 구조에선 연결 상태에서만 추가하므로 비워둠 */ }
 
 /* ---------- 렌더 ---------- */
