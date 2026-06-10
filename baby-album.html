@@ -476,7 +476,7 @@ document.getElementById("fileInput").onchange = async (e)=>{
         catch(_){ blob = f; mime = f.type || "application/octet-stream"; ext = (f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg"; }
         photos.push({id:tempId, date:det.date, thumbBase:null, localThumb, uploading:true}); render();
         const fileName = det.date+"_"+uid()+"."+ext;
-        const up = await uploadWithRetry(blob, fileName, det.exif?det.date:null, mime);
+        const up = await uploadWithRetry(blob, fileName, det.date, mime);  // EXIF 없으면 파일 저장일(다운로드일)이라도 기록
         const idx = photos.findIndex(p=>p.id===tempId);
         if(idx>=0) photos[idx] = {id:up.id, date: (up.appProperties&&up.appProperties.albumDate)||det.date, thumbBase:up.thumbnailLink||null, localThumb};
         done++;
