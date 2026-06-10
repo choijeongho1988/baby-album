@@ -41,11 +41,14 @@
   .syncstatus{margin-top:10px;font-size:12px;color:var(--text-soft);min-height:16px;display:inline-flex;align-items:center;gap:6px}
   .syncstatus.ok{color:var(--mint-deep);font-weight:700}
   .syncstatus.err{color:var(--pink-deep);font-weight:700}
-  .resetlink{
-    display:block;margin:8px auto 0;border:none;background:none;cursor:pointer;
-    color:var(--text-soft);font-size:11px;font-family:inherit;text-decoration:underline;opacity:.65;
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .tab{
+    border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;
+    padding:9px 20px;border-radius:999px;background:#fff;color:var(--text-soft);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);transition:transform .12s, background .15s, color .15s;
   }
-  .resetlink:hover{color:var(--pink-deep);opacity:1}
+  .tab:active{transform:scale(.96)}
+  .tab.active{background:var(--pink);color:var(--text);box-shadow:var(--shadow)}
   .empty{text-align:center;margin-top:60px;color:var(--text-soft);line-height:1.9}
   .empty .big{font-size:54px}
   .day{background:var(--card);border-radius:24px;box-shadow:var(--shadow);margin-top:24px;overflow:hidden}
@@ -113,8 +116,8 @@
       <button class="btn" id="addBtn">＋ 사진 추가</button>
       <button class="btn ghost" id="syncBtn">☁ 구글 연결</button>
     </div>
+    <div class="tabs" id="tabs"></div>
     <div class="syncstatus" id="syncStatus"></div>
-    <button class="resetlink" id="resetBtn">처음부터 다시 시작 (초기화)</button>
   </header>
   <div id="album"></div>
   <div class="empty" id="empty" style="display:none">
@@ -145,20 +148,27 @@
    구글 드라이브 연동용 클라이언트 ID. (안내서 참고) */
 const CLIENT_ID = "719745914765-ceof50r3kpscdp2fvhdqeb0a1v43fuur.apps.googleusercontent.com";
 
-/* 가족 공유: 아빠가 만든 '베이비앨범' 폴더를 가족과 공유하고, 그 폴더 ID를 아래에 넣으면
-   모두가 같은 앨범을 보게 됩니다. (비워두면 각자 자기 드라이브에 따로 저장됩니다) */
-const SHARED_FOLDER_ID = "1sxKhFuahhavWgKWS3IGbzNQorbTZ3S4_";   // 꼬미사진방 (가족 공유 폴더)
+/* 가족 공유 앨범 목록 — 각 앨범 = 가족과 공유한 구글 드라이브 폴더 하나.
+   폴더 ID는 드라이브에서 폴더를 열었을 때 주소창 folders/ 뒤의 값이에요.
+   상단 탭으로 앨범을 전환하고, 그 앨범의 폴더에 사진이 올라갑니다. */
+const ALBUMS = [
+  { name:"꼬미사진방", id:"1sxKhFuahhavWgKWS3IGbzNQorbTZ3S4_" },
+  { name:"옥이사진방", id:"1aFJRmScOYKAFZICkylByVkDk_d--_egP" },
+];
 
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"; // 공유 폴더 읽기/쓰기 위해 전체 접근
 const ALLDRIVES = "supportsAllDrives=true&includeItemsFromAllDrives=true";
-const FOLDER_NAME = "꼬미사진방";
 const META_NAME = "album-meta.json";
 
-const META_KEY = "babyAlbum.meta";      // {name, comments, updatedAt} (작음)
-const FOLDER_KEY = "babyAlbum.folder";  // 폴더 id 캐시
+const META_KEY = "babyAlbum.meta";      // 앨범별 코멘트 캐시
 const FLAG_KEY = "babyAlbum.drive";     // 연결 여부
 const TOKEN_KEY = "babyAlbum.tok";      // 액세스 토큰 캐시(약 1시간)
 const dotColors = ["#f7c5d6","#c7e7d8","#d9d3ef","#fbe7b4","#f9cfc0"];
+
+let albumIdx = parseInt(localStorage.getItem("babyAlbum.idx")||"0",10);
+if(isNaN(albumIdx)||albumIdx<0||albumIdx>=ALBUMS.length) albumIdx=0;
+function curFolderId(){ return ALBUMS[albumIdx].id; }
+function metaKey(){ return META_KEY+"."+albumIdx; }
 
 let meta = loadMeta();      // {name, comments:{date:[...]}, updatedAt}
 let photos = [];            // 드라이브에서 가져온 사진 목록 [{id,date,thumbBase,localThumb,uploading}]
@@ -168,10 +178,10 @@ const PREVIEW_LIMIT = 4;
 
 /* ---------- 로컬 메타(이름·코멘트만, 매우 작음) ---------- */
 function loadMeta(){
-  try{ const o=JSON.parse(localStorage.getItem(META_KEY)||"null"); if(o&&o.name) return o; }catch(e){}
-  return { name:"우리 아기 앨범", comments:{}, updatedAt:0 };
+  try{ const o=JSON.parse(localStorage.getItem(metaKey())||"null"); if(o&&o.name) return o; }catch(e){}
+  return { name:ALBUMS[albumIdx].name, comments:{}, updatedAt:0 };
 }
-function saveMetaLocal(){ try{ localStorage.setItem(META_KEY, JSON.stringify(meta)); }catch(e){} }
+function saveMetaLocal(){ try{ localStorage.setItem(metaKey(), JSON.stringify(meta)); }catch(e){} }
 
 /* ---------- 구글 토큰 ---------- */
 function driveConfigured(){ return CLIENT_ID && !CLIENT_ID.startsWith("여기에"); }
@@ -198,35 +208,24 @@ function getToken(interactive){
     if(!driveConfigured()) return reject("noconfig");
     if(!window.google||!google.accounts) return reject("nogis");
     if(!tokenClient){
-      tokenClient = google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:DRIVE_SCOPE,callback:()=>{}});
+      tokenClient = google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:DRIVE_SCOPE,callback:()=>{},error_callback:()=>{}});
     }
-    tokenClient.callback = (resp)=>{ if(resp&&resp.access_token){storeToken(resp);resolve(accessToken);} else reject(resp); };
-    try{ tokenClient.requestAccessToken({prompt: interactive?"consent":""}); }catch(e){ reject(e); }
+    let settled=false;
+    tokenClient.callback = (resp)=>{
+      if(settled) return; settled=true;
+      if(resp&&resp.access_token){ storeToken(resp); resolve(accessToken); } else reject(resp||"noresp");
+    };
+    tokenClient.error_callback = (err)=>{ if(settled) return; settled=true; reject(err||"popup"); };
+    try{ tokenClient.requestAccessToken({prompt: interactive?"consent":""}); }
+    catch(e){ if(!settled){ settled=true; reject(e); } }
   });
 }
 function authHead(){ return {Authorization:"Bearer "+accessToken}; }
 
 /* ---------- 드라이브 API ---------- */
 async function ensureFolder(){
-  // 가족 공유: 지정된 공유 폴더를 모두가 사용
-  if(SHARED_FOLDER_ID){ folderId = SHARED_FOLDER_ID; return folderId; }
-  const cached = localStorage.getItem(FOLDER_KEY);
-  if(cached){
-    const r = await fetch("https://www.googleapis.com/drive/v3/files/"+cached+"?fields=id,trashed&"+ALLDRIVES,{headers:authHead()});
-    if(r.ok){ const j=await r.json(); if(!j.trashed){ folderId=cached; return folderId; } }
-  }
-  const q = encodeURIComponent("name='"+FOLDER_NAME+"' and mimeType='application/vnd.google-apps.folder' and trashed=false");
-  const r = await fetch("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id)&"+ALLDRIVES,{headers:authHead()});
-  const j = await r.json();
-  if(j.files && j.files[0]){ folderId=j.files[0].id; }
-  else{
-    const cr = await fetch("https://www.googleapis.com/drive/v3/files?"+ALLDRIVES,{
-      method:"POST", headers:Object.assign({"Content-Type":"application/json"},authHead()),
-      body:JSON.stringify({name:FOLDER_NAME, mimeType:"application/vnd.google-apps.folder"})
-    });
-    const cj = await cr.json(); folderId = cj.id;
-  }
-  localStorage.setItem(FOLDER_KEY, folderId);
+  folderId = curFolderId();
+  if(!folderId) throw new Error("no-folder");
   return folderId;
 }
 
@@ -319,16 +318,23 @@ function scheduleMetaSync(){
 /* ---------- 연결 / 새로고침 시 불러오기 ---------- */
 function connectDrive(){
   if(!driveConfigured()){ toast("먼저 안내서대로 클라이언트 ID를 넣어주세요"); setSync("구글 연결 설정 필요 — 안내서 참고","err"); return; }
+  if(!curFolderId()){ setSync("이 앨범 폴더가 아직 설정되지 않았어요","err"); return; }
   setSync("연결 중…");
+  const watchdog = setTimeout(()=>setSync("연결이 지연돼요 — 초대받은 구글 계정이 맞는지 확인하고 다시 '☁ 구글 연결'","err"), 30000);
   whenGoogleReady(async ()=>{
     try{
       await getToken(true);
       localStorage.setItem(FLAG_KEY,"1");
       await refreshFromDrive();
-      await flushPendingUploads();   // 오프라인에 쌓아둔 게 있으면 올림
+      clearTimeout(watchdog);
       setSync("구글 드라이브 연결됨 ✓","ok");
       toast("구글 드라이브에 연결됐어요 ☁️");
-    }catch(e){ setSync("연결 실패 — '☁ 구글 연결'을 다시 눌러주세요","err"); }
+    }catch(e){
+      clearTimeout(watchdog);
+      const code = (e&&(e.type||e.error))||"";
+      if(String(code).indexOf("popup")>=0) setSync("로그인 창이 닫혔어요 — 팝업 허용 후 다시 '☁ 구글 연결'","err");
+      else setSync("연결 실패 — 초대받은 계정으로 다시 '☁ 구글 연결'","err");
+    }
   });
 }
 function restoreDrive(){
@@ -340,6 +346,7 @@ function restoreDrive(){
   });
 }
 async function refreshFromDrive(){
+  if(!curFolderId()){ setSync("이 앨범은 폴더가 아직 설정되지 않았어요 (코드에 폴더 ID 입력 필요)","err"); return; }
   setSync("드라이브에서 불러오는 중…");
   await ensureFolder();
   await findMetaFile();
@@ -358,6 +365,7 @@ document.getElementById("addBtn").onclick = ()=> document.getElementById("fileIn
 document.getElementById("fileInput").onchange = async (e)=>{
   const files=[...e.target.files]; e.target.value="";
   if(!files.length) return;
+  if(!curFolderId()){ toast("이 앨범 폴더가 아직 설정되지 않았어요"); return; }
   if(!driveConnected()){ toast("먼저 '☁ 구글 연결'을 눌러주세요"); return; }
   if(!haveToken()){ toast("구글 연결이 만료됐어요 — '☁ 구글 연결' 다시 클릭"); setSync("구글 다시 연결 필요 — '☁ 구글 연결'","err"); return; }
   toast(files.length+"장 올리는 중…");
@@ -493,29 +501,27 @@ document.getElementById("babyName").onclick=()=>{ document.getElementById("nameP
 document.getElementById("nameOk").onclick=()=>{ const v=document.getElementById("namePick").value.trim(); if(v){ meta.name=v; scheduleMetaSync(); render(); } hideModal("nameModal"); };
 document.getElementById("nameCancel").onclick=()=>hideModal("nameModal");
 
-/* 연결 / 초기화 버튼 */
+/* 연결 버튼 */
 document.getElementById("syncBtn").onclick=()=>connectDrive();
-document.getElementById("resetBtn").onclick=()=>resetAll();
-async function resetAll(){
-  const shared = !!SHARED_FOLDER_ID;
-  const msg = shared
-    ? "이 기기 화면을 새로고침할게요.\n(공유 앨범이라 드라이브의 사진은 지우지 않아요 — 가족 모두의 앨범이라서요)"
-    : "앨범의 모든 사진과 코멘트를 지우고 처음 상태로 되돌릴까요?\n(구글 드라이브의 '"+FOLDER_NAME+"' 폴더와 사진이 함께 삭제됩니다. 되돌릴 수 없어요)";
-  if(!confirm(msg)) return;
-  try{
-    if(!shared && driveConnected() && haveToken()){
-      if(!folderId) await ensureFolder();
-      if(folderId) await fetch("https://www.googleapis.com/drive/v3/files/"+folderId+"?"+ALLDRIVES,{method:"DELETE",headers:authHead()});
-    }
-  }catch(e){}
-  metaFileId=null;
-  try{ localStorage.removeItem(FOLDER_KEY); localStorage.removeItem(META_KEY); }catch(e){}
-  if(!shared) folderId=null;
-  meta={name:"우리 아기 앨범",comments:{},updatedAt:0}; photos=[]; expandedDays.clear();
-  render();
-  if(shared && driveConnected()){ restoreDrive(); }   // 공유 앨범은 다시 불러오기만
-  else setSync(driveConnected()?"초기화 완료 ✓ 새로 올려보세요":"초기화했어요", driveConnected()?"ok":"");
-  toast(shared?"새로고침했어요":"초기화했어요. 새로 올려보세요 🍼");
+
+/* ---------- 앨범 탭 전환 ---------- */
+function renderTabs(){
+  const el=document.getElementById("tabs");
+  el.innerHTML=ALBUMS.map((a,i)=>`<button class="tab ${i===albumIdx?'active':''}" data-album="${i}">${esc(a.name)}</button>`).join("");
+}
+document.getElementById("tabs").addEventListener("click",(e)=>{
+  const b=e.target.closest("[data-album]"); if(!b) return;
+  switchAlbum(parseInt(b.getAttribute("data-album"),10));
+});
+function switchAlbum(i){
+  if(i===albumIdx) return;
+  albumIdx=i; try{ localStorage.setItem("babyAlbum.idx",String(i)); }catch(e){}
+  meta=loadMeta(); metaFileId=null; folderId=null; photos=[]; expandedDays.clear();
+  renderTabs(); render();
+  if(!curFolderId()){ setSync("이 앨범 폴더가 아직 설정되지 않았어요 (코드에 폴더 ID 입력 필요)","err"); return; }
+  if(driveConnected() && haveToken()) restoreDrive();
+  else if(driveConnected()) setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결' 클릭","err");
+  else setSync("'☁ 구글 연결'을 누르면 사진이 보여요");
 }
 
 /* ---------- 유틸 ---------- */
@@ -584,8 +590,10 @@ let toastTimer;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
 
 /* ---------- 시작 ---------- */
+renderTabs();
 render();
-if(driveConnected()) restoreDrive();
+if(!curFolderId()) setSync("이 앨범 폴더가 아직 설정되지 않았어요 (코드에 폴더 ID 입력 필요)","err");
+else if(driveConnected()) restoreDrive();
 else if(driveConfigured()) setSync("'☁ 구글 연결'을 누르면 사진이 드라이브에 저장돼요");
 else setSync("구글 연결은 안내서 설정 후 가능");
 </script>
