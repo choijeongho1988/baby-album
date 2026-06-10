@@ -114,6 +114,20 @@
     font-size:14px;line-height:1;opacity:0;transition:opacity .15s;
   }
   .photo:hover .del{opacity:1}
+  .photo .more{
+    position:absolute;inset:0;border:none;cursor:pointer;
+    background:rgba(60,45,55,.52);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    font-family:inherit;
+  }
+  .photo .more b{font-size:21px;font-weight:800;line-height:1.1}
+  .photo .more span{font-size:11px;font-weight:600;opacity:.9}
+  .photo .more *{pointer-events:none}
+  .collapse{
+    display:block;margin:2px auto 10px;border:none;cursor:pointer;
+    background:var(--bg2);color:var(--text-soft);font-weight:700;font-family:inherit;
+    border-radius:999px;padding:7px 18px;font-size:13px;
+  }
 
   .comments{padding:6px 20px 20px}
   .comment{
@@ -258,9 +272,19 @@ function load(){
 }
 function saveLocal(){
   try{
-    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    if(driveConnected()){
+      // 드라이브가 원본 저장소 — 기기엔 사진을 쌓지 않고 가벼운 정보만 캐시(저장 공간 안 참)
+      const light = Object.assign({}, data, {photos:[], _light:true});
+      localStorage.setItem(STORE_KEY, JSON.stringify(light));
+    }else{
+      delete data._light;
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }
   }catch(e){
-    toast("이 기기 저장 공간이 가득 찼어요 😢 구글 연결 또는 백업을 권장해요");
+    // 미연결 상태에서 기기 한도를 넘기면 사진 제외 후 저장 + 안내
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({}, data, {photos:[], _light:true}))); }catch(e2){}
+    if(!driveConnected())
+      toast("이 기기 저장 공간이 가득 찼어요 😢 구글 연결을 권장해요");
   }
 }
 function save(){
@@ -270,8 +294,24 @@ function save(){
 }
 
 /* ===== 구글 드라이브 연동 ===== */
+const TOKEN_KEY = "babyAlbum.tok";
 function driveConfigured(){ return CLIENT_ID && !CLIENT_ID.startsWith("여기에"); }
 function driveConnected(){ return localStorage.getItem(DRIVE_FLAG)==="1"; }
+
+// 액세스 토큰을 1시간 동안 재사용 — 새로고침마다 팝업이 뜨지 않게
+function storeToken(resp){
+  accessToken = resp.access_token;
+  const expiry = Date.now() + ((resp.expires_in?resp.expires_in:3500)*1000) - 60000;
+  try{ localStorage.setItem(TOKEN_KEY, JSON.stringify({t:accessToken, e:expiry})); }catch(e){}
+}
+function loadCachedToken(){
+  try{
+    const o = JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");
+    if(o && o.t && o.e > Date.now()){ accessToken=o.t; return true; }
+  }catch(e){}
+  return false;
+}
+function haveToken(){ return !!accessToken || loadCachedToken(); }
 
 function setSync(msg, kind){
   const el=document.getElementById("syncStatus");
@@ -299,7 +339,7 @@ function getToken(interactive){
       });
     }
     tokenClient.callback = (resp)=>{
-      if(resp && resp.access_token){ accessToken=resp.access_token; resolve(accessToken); }
+      if(resp && resp.access_token){ storeToken(resp); resolve(accessToken); }
       else reject(resp);
     };
     try{ tokenClient.requestAccessToken({prompt: interactive ? "consent" : ""}); }
@@ -344,6 +384,16 @@ async function driveUpload(obj){
   return j;
 }
 
+// 드라이브에서 내려받아 화면 갱신 (force=true면 로컬보다 오래됐어도 덮어씀)
+async function pullFromDrive(force){
+  await driveFind();
+  const remote = await driveDownload();
+  if(remote && (force || (remote.updatedAt||0) > (data.updatedAt||0))){
+    data = remote; saveLocal(); render();
+  }
+}
+
+// 사용자가 '구글 연결'을 직접 누를 때만 동의 팝업이 뜸
 function connectDrive(){
   if(!driveConfigured()){
     toast("먼저 안내서대로 구글 클라이언트 ID를 넣어주세요");
@@ -354,53 +404,53 @@ function connectDrive(){
   whenGoogleReady(async ()=>{
     try{
       await getToken(true);
-      await driveFind();
-      const remote = await driveDownload();
-      if(remote && (remote.updatedAt||0) > (data.updatedAt||0)){
-        data = remote; saveLocal();
-      }else{
-        await driveUpload(data);
-      }
+      const wasLight = !!data._light;
+      await pullFromDrive(wasLight);
+      if(!driveFileId) await driveUpload(data);   // 드라이브에 파일이 없으면 새로 올림
       localStorage.setItem(DRIVE_FLAG,"1");
       render();
       setSync("구글 드라이브 연결됨 ✓ 자동 저장 중", "ok");
       toast("구글 드라이브에 연결됐어요 ☁️");
     }catch(e){
-      setSync("연결 실패 — '구글 연결'을 다시 눌러주세요", "err");
+      setSync("연결 실패 — '☁ 구글 연결'을 다시 눌러주세요", "err");
     }
   });
 }
 
+// 새로고침 시: 저장된 토큰이 살아있으면 팝업 없이 조용히 동기화, 없으면 안내만
 function restoreDrive(){
   if(!driveConnected() || !driveConfigured()) return;
+  if(!haveToken()){
+    setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결' 클릭", "err");
+    return;
+  }
   whenGoogleReady(async ()=>{
     try{
-      await getToken(false);
-      await driveFind();
-      const remote = await driveDownload();
-      if(remote && (remote.updatedAt||0) > (data.updatedAt||0)){
-        data = remote; saveLocal(); render();
-      }
+      await pullFromDrive(!!data._light);
       setSync("구글 드라이브 연결됨 ✓ 자동 저장 중", "ok");
     }catch(e){
-      setSync("구글 다시 연결이 필요해요 — '구글 연결' 클릭", "err");
+      setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결' 클릭", "err");
     }
   });
 }
 
+// 변경 후 자동 업로드 — 토큰이 살아있을 때만(팝업 절대 안 띄움)
 function scheduleSync(){
   if(!driveConnected() || !driveConfigured()) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(()=>{
+    if(!haveToken()){
+      setSync("변경됨 · 저장하려면 '☁ 구글 연결' 클릭", "err");
+      return;
+    }
     whenGoogleReady(async ()=>{
       try{
         setSync("동기화 중…");
-        await getToken(false);
         if(!driveFileId) await driveFind();
         await driveUpload(data);
         setSync("구글 드라이브 연결됨 ✓ 자동 저장 중", "ok");
       }catch(e){
-        setSync("동기화 실패 — 잠시 후 자동 재시도", "err");
+        setSync("저장 실패 · '☁ 구글 연결' 다시 클릭", "err");
       }
     });
   }, 1500);
@@ -515,6 +565,9 @@ function compress(file){
 }
 
 /* ---- render ---- */
+const PREVIEW_LIMIT = 4;           // 미리보기로 보여줄 사진 수
+const expandedDays = new Set();    // 펼쳐진 날짜 기억(임시)
+
 function render(){
   const album = document.getElementById("album");
   const empty = document.getElementById("empty");
@@ -538,11 +591,23 @@ function render(){
 
     let photoHTML = "";
     if(photos.length){
-      photoHTML = `<div class="grid">` + photos.map(p=>`
-        <div class="photo">
+      const expanded = expandedDays.has(d);
+      const collapsed = !expanded && photos.length > PREVIEW_LIMIT;
+      const show = collapsed ? photos.slice(0, PREVIEW_LIMIT) : photos;
+      const hidden = photos.length - PREVIEW_LIMIT; // 마지막 칸에 덮어 표시할 수
+      photoHTML = `<div class="grid">` + show.map((p,idx)=>{
+        const isLast = collapsed && idx === PREVIEW_LIMIT-1;
+        const overlay = isLast
+          ? `<button class="more" data-more="${d}"><b>+${hidden}</b><span>모두 보기</span></button>` : "";
+        return `<div class="photo">
           <img src="${p.src}" data-full="${p.src}" loading="lazy" alt=""/>
+          ${overlay}
           <button class="del" data-del="${p.id}" title="삭제">×</button>
-        </div>`).join("") + `</div>`;
+        </div>`;
+      }).join("") + `</div>`;
+      if(expanded && photos.length > PREVIEW_LIMIT){
+        photoHTML += `<button class="collapse" data-collapse="${d}">접기 ▲</button>`;
+      }
     }
 
     let commentHTML = comments.map(c=>`
@@ -600,25 +665,29 @@ document.getElementById("fileInput").onchange = async (e)=>{
 
 // delegated clicks
 document.getElementById("album").addEventListener("click",(e)=>{
-  const delId = e.target.getAttribute("data-del");
-  if(delId){
+  const more = e.target.closest("[data-more]");
+  if(more){ expandedDays.add(more.getAttribute("data-more")); render(); return; }
+  const collapse = e.target.closest("[data-collapse]");
+  if(collapse){ expandedDays.delete(collapse.getAttribute("data-collapse")); render(); return; }
+  const del = e.target.closest("[data-del]");
+  if(del){
     if(confirm("이 사진을 삭제할까요?")){
-      data.photos = data.photos.filter(p=>p.id!==delId);
+      data.photos = data.photos.filter(p=>p.id!==del.getAttribute("data-del"));
       save(); render();
     }
     return;
   }
-  const cdel = e.target.getAttribute("data-cdel");
+  const cdel = e.target.closest("[data-cdel]");
   if(cdel){
-    const d = e.target.getAttribute("data-cdate");
-    data.comments[d] = (data.comments[d]||[]).filter(c=>c.id!==cdel);
+    const d = cdel.getAttribute("data-cdate");
+    data.comments[d] = (data.comments[d]||[]).filter(c=>c.id!==cdel.getAttribute("data-cdel"));
     save(); render();
     return;
   }
-  const cadd = e.target.getAttribute("data-cadd");
-  if(cadd){ addComment(cadd); return; }
-  const full = e.target.getAttribute("data-full");
-  if(full){ openLB(full); return; }
+  const cadd = e.target.closest("[data-cadd]");
+  if(cadd){ addComment(cadd.getAttribute("data-cadd")); return; }
+  const full = e.target.closest("[data-full]");
+  if(full){ openLB(full.getAttribute("data-full")); return; }
 });
 // enter to add comment
 document.getElementById("album").addEventListener("keydown",(e)=>{
