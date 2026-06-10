@@ -104,6 +104,7 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -242,11 +243,18 @@ async function listPhotos(){
     if(!r.ok) throw new Error("list "+r.status);
     const j = await r.json();
     (j.files||[]).forEach(f=>{
-      out.push({ id:f.id, date:resolveDate(f), thumbBase:f.thumbnailLink||null });
+      out.push({ id:f.id, name:f.name, date:resolveDate(f), thumbBase:f.thumbnailLink||null, needsExif:isWeakDate(f) });
     });
     pageToken = j.nextPageToken||"";
   }while(pageToken);
   return out;
+}
+// 드라이브가 날짜를 못 줘서 '올린 날짜'로 떨어진 경우 → 사진 파일에서 직접 EXIF를 읽어야 함
+function isWeakDate(f){
+  if(f.appProperties && f.appProperties.albumDate) return false;
+  if(f.imageMediaMetadata && f.imageMediaMetadata.time && /^\d{4}[:\-]\d{2}[:\-]\d{2}/.test(f.imageMediaMetadata.time)) return false;
+  if(dateFromName(f.name)) return false;
+  return true;
 }
 function resolveDate(f){
   // 1) 앱이 기록한 촬영일  2) 구글이 읽은 EXIF 촬영일  3) 파일명 속 날짜  4) 올린 날짜
@@ -385,6 +393,57 @@ async function refreshFromDrive(){
   photos = list.concat(pending);
   render();
   setSync("구글 드라이브 연결됨 ✓","ok");
+  resolvePhotoDates();   // 날짜를 못 읽은 사진은 파일에서 직접 EXIF 추출(백그라운드)
+}
+
+/* 드라이브가 날짜를 못 준 사진 → 파일 앞부분을 받아 EXIF 촬영일을 직접 읽고, 드라이브에 기록 */
+let exifBusy=false;
+async function ensureExifr(){ for(let i=0;i<40 && typeof exifr==="undefined";i++) await sleep(150); return typeof exifr!=="undefined"; }
+async function resolvePhotoDates(){
+  if(exifBusy || !haveToken()) return;
+  const targets = photos.filter(p=>p.needsExif && !p.uploading);
+  if(!targets.length) return;
+  if(!(await ensureExifr())) return;
+  exifBusy=true;
+  let fixed=0, n=0;
+  try{
+    for(const p of targets){
+      n++;
+      if(n%10===0) setSync(`사진 날짜 정리 중… ${n}/${targets.length}`);
+      try{
+        // 파일 앞 1MB만 받아서 EXIF 추출(HEIC도 보통 앞쪽에 있음)
+        const r = await fetch("https://www.googleapis.com/drive/v3/files/"+p.id+"?alt=media&"+ALLDRIVES,
+          {headers:Object.assign({Range:"bytes=0-1048575"},authHead())});
+        if(r.ok){
+          const buf = await r.arrayBuffer();
+          let ex=null; try{ ex = await exifr.parse(buf,{pick:["DateTimeOriginal","CreateDate","ModifyDate"]}); }catch(_){}
+          const dt = ex && (ex.DateTimeOriginal||ex.CreateDate||ex.ModifyDate);
+          if(dt){
+            const d=new Date(dt);
+            if(!isNaN(d)){
+              const ds=dateFromTs(d.getTime());
+              if(ds!==p.date){ p.date=ds; fixed++; render(); }
+              patchAlbumDate(p.id, ds);   // 드라이브에 기록 → 다음부턴 바로
+            }
+          }
+        }
+      }catch(e){}
+      p.needsExif=false;
+      await sleep(60);
+    }
+  }finally{
+    exifBusy=false;
+    if(fixed) render();
+    setSync("구글 드라이브 연결됨 ✓","ok");
+  }
+}
+async function patchAlbumDate(id, date){
+  try{
+    await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?"+ALLDRIVES,{
+      method:"PATCH", headers:Object.assign({"Content-Type":"application/json"},authHead()),
+      body:JSON.stringify({appProperties:{albumDate:date}})
+    });
+  }catch(e){}
 }
 
 /* ---------- 사진 추가 ---------- */
