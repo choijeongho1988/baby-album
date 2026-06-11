@@ -13,42 +13,27 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
-  body{
-    font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
-    color:var(--text); background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%);
-    min-height:100vh; -webkit-font-smoothing:antialiased;
-  }
+  body{font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;color:var(--text);background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%);min-height:100vh;-webkit-font-smoothing:antialiased}
   .wrap{max-width:760px;margin:0 auto;padding:0 16px 120px}
   header.app{text-align:center;padding:30px 16px 18px}
-  .babyname{
-    font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);
-    display:inline-flex;align-items:center;gap:8px;cursor:pointer;border-radius:14px;padding:4px 12px;transition:background .15s;
-  }
-  .babyname:hover{background:#fff6}
-  .babyname small{font-size:13px;color:var(--text-soft);font-weight:500}
+  .babyname{font-size:25px;font-weight:800;letter-spacing:-.5px;color:var(--text);display:inline-flex;align-items:center;gap:8px;border-radius:14px;padding:4px 12px}
   .subtitle{margin-top:6px;color:var(--text-soft);font-size:13px}
   .heart{color:var(--pink-deep)}
   .toolbar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
-  .btn{
-    border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;color:var(--text);
-    background:var(--pink);padding:13px 22px;border-radius:999px;box-shadow:var(--shadow);
-    transition:transform .12s, filter .15s;display:inline-flex;align-items:center;gap:7px;
-  }
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;color:var(--text);background:var(--pink);padding:13px 22px;border-radius:999px;box-shadow:var(--shadow);transition:transform .12s, filter .15s;display:inline-flex;align-items:center;gap:7px}
   .btn:active{transform:scale(.96)}
   .btn:hover{filter:brightness(1.03)}
   .btn.ghost{background:#fff;color:var(--text-soft);box-shadow:0 2px 10px rgba(0,0,0,.05)}
-  .btn:disabled{opacity:.5;cursor:default}
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .tab{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;padding:9px 18px;border-radius:999px;background:#fff;color:var(--text-soft);box-shadow:0 2px 10px rgba(0,0,0,.05);transition:transform .12s, background .15s, color .15s}
+  .tab:active{transform:scale(.96)}
+  .tab.active{background:var(--pink);color:var(--text);box-shadow:var(--shadow)}
+  .tab.newalbum{background:var(--mint);color:var(--text)}
   .syncstatus{margin-top:10px;font-size:12px;color:var(--text-soft);min-height:16px;display:inline-flex;align-items:center;gap:6px}
   .syncstatus.ok{color:var(--mint-deep);font-weight:700}
   .syncstatus.err{color:var(--pink-deep);font-weight:700}
-  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-  .tab{
-    border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;
-    padding:9px 20px;border-radius:999px;background:#fff;color:var(--text-soft);
-    box-shadow:0 2px 10px rgba(0,0,0,.05);transition:transform .12s, background .15s, color .15s;
-  }
-  .tab:active{transform:scale(.96)}
-  .tab.active{background:var(--pink);color:var(--text);box-shadow:var(--shadow)}
+  .settingslink{display:block;margin:8px auto 0;border:none;background:none;cursor:pointer;color:var(--text-soft);font-size:11px;font-family:inherit;text-decoration:underline;opacity:.6}
+  .settingslink:hover{color:var(--pink-deep);opacity:1}
   .empty{text-align:center;margin-top:60px;color:var(--text-soft);line-height:1.9}
   .empty .big{font-size:54px}
   .day{background:var(--card);border-radius:24px;box-shadow:var(--shadow);margin-top:24px;overflow:hidden}
@@ -61,15 +46,9 @@
   @media(max-width:480px){.grid{grid-template-columns:repeat(2,1fr)}}
   .photo{position:relative;aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:var(--bg2);cursor:pointer}
   .photo img{width:100%;height:100%;object-fit:cover;display:block}
-  .photo .del{
-    position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;
-    background:rgba(0,0,0,.45);color:#fff;border:none;cursor:pointer;font-size:14px;line-height:1;opacity:0;transition:opacity .15s;
-  }
+  .photo .del{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;border:none;cursor:pointer;font-size:14px;line-height:1;opacity:0;transition:opacity .15s}
   .photo:hover .del{opacity:1}
-  .photo .more{
-    position:absolute;inset:0;border:none;cursor:pointer;background:rgba(60,45,55,.52);color:#fff;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit;
-  }
+  .photo .more{position:absolute;inset:0;border:none;cursor:pointer;background:rgba(60,45,55,.52);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit}
   .photo .more b{font-size:21px;font-weight:800;line-height:1.1}
   .photo .more span{font-size:11px;font-weight:600;opacity:.9}
   .photo .more *{pointer-events:none}
@@ -91,15 +70,6 @@
   .lb.show{display:flex}
   .lb img{max-width:100%;max-height:88vh;border-radius:16px;box-shadow:0 10px 50px rgba(0,0,0,.5)}
   .lb .x{position:absolute;top:18px;right:20px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1}
-  .modal{position:fixed;inset:0;background:rgba(70,50,60,.45);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
-  .modal.show{display:flex}
-  .sheet{background:#fff;border-radius:22px;padding:24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
-  .sheet h3{margin:0 0 6px;font-size:18px}
-  .sheet p{margin:0 0 16px;color:var(--text-soft);font-size:13px}
-  .sheet input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px;font-size:15px;font-family:inherit;color:var(--text);outline:none;text-align:center}
-  .sheet input:focus{border-color:var(--pink-deep)}
-  .sheet .row{display:flex;gap:10px;margin-top:18px}
-  .sheet .row .btn{flex:1;justify-content:center;padding:12px}
   .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;z-index:80;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -109,10 +79,8 @@
 <body>
 <div class="wrap">
   <header class="app">
-    <div class="babyname" id="babyName" title="이름을 바꾸려면 누르세요">
-      <span id="babyNameText">우리 아기 앨범</span><small>✏️</small>
-    </div>
-    <div class="subtitle">사진을 올리면 <span class="heart">♥</span> 찍은 날짜별로 자동 정리돼요</div>
+    <div class="babyname"><span id="babyNameText">우리 아기 앨범</span></div>
+    <div class="subtitle">사진을 올리면 <span class="heart">♥</span> 찍은 날짜별로 정리돼요</div>
     <div class="toolbar">
       <button class="btn" id="addBtn">＋ 사진 추가</button>
       <button class="btn" id="retryBtn" style="display:none;background:var(--yellow)">⟳ 실패분 다시 올리기</button>
@@ -121,201 +89,160 @@
     </div>
     <div class="tabs" id="tabs"></div>
     <div class="syncstatus" id="syncStatus"></div>
+    <button class="settingslink" id="settingsBtn">⚙ 메인 폴더 설정</button>
   </header>
   <div id="album"></div>
-  <div class="empty" id="empty" style="display:none">
-    <div class="big">🍼</div>
-    <div>아직 사진이 없어요.<br>위의 <b>＋ 사진 추가</b>를 눌러<br>첫 사진을 올려보세요!</div>
-  </div>
+  <div class="empty" id="empty" style="display:none"></div>
 </div>
 
 <input type="file" id="fileInput" accept="image/*,.heic,.heif" multiple style="display:none" />
-
 <div class="lb" id="lb"><button class="x" id="lbX">×</button><img id="lbImg" src="" alt=""/></div>
-
-<div class="modal" id="nameModal">
-  <div class="sheet">
-    <h3>앨범 이름</h3>
-    <p>아기 이름이나 앨범 제목을 적어주세요</p>
-    <input type="text" id="namePick" maxlength="20" placeholder="예) 하준이의 성장일기" />
-    <div class="row">
-      <button class="btn ghost" id="nameCancel">취소</button>
-      <button class="btn" id="nameOk">저장</button>
-    </div>
-  </div>
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ===== 설정 =====
-   구글 드라이브 연동용 클라이언트 ID. (안내서 참고) */
+/* ===== 설정 ===== */
 const CLIENT_ID = "719745914765-ceof50r3kpscdp2fvhdqeb0a1v43fuur.apps.googleusercontent.com";
-
-/* 가족 공유 앨범 목록 — 각 앨범 = 가족과 공유한 구글 드라이브 폴더 하나.
-   폴더 ID는 드라이브에서 폴더를 열었을 때 주소창 folders/ 뒤의 값이에요.
-   상단 탭으로 앨범을 전환하고, 그 앨범의 폴더에 사진이 올라갑니다. */
-const ALBUMS = [
-  { name:"꼬미사진방", id:"1sxKhFuahhavWgKWS3IGbzNQorbTZ3S4_" },
-  { name:"옥이사진방", id:"1aFJRmScOYKAFZICkylByVkDk_d--_egP" },
-];
-
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"; // 공유 폴더 읽기/쓰기 위해 전체 접근
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive";
 const ALLDRIVES = "supportsAllDrives=true&includeItemsFromAllDrives=true";
+const ROOT_NAME = "베이비앨범";          // 메인 폴더가 없을 때 내 드라이브에 자동 생성할 이름
 const META_NAME = "album-meta.json";
+const FOLDER_MIME = "application/vnd.google-apps.folder";
 
-const META_KEY = "babyAlbum.meta";      // 앨범별 코멘트 캐시
-const FLAG_KEY = "babyAlbum.drive";     // 연결 여부
-const TOKEN_KEY = "babyAlbum.tok";      // 액세스 토큰 캐시(약 1시간)
+const ROOT_KEY = "babyAlbum.root";        // 메인 폴더 id (계정/기기별)
+const ALBUMID_KEY = "babyAlbum.albumid";  // 마지막으로 본 앨범 폴더 id
+const META_KEY = "babyAlbum.meta";        // 앨범별 코멘트 캐시
+const FLAG_KEY = "babyAlbum.drive";
+const TOKEN_KEY = "babyAlbum.tok";
 const dotColors = ["#f7c5d6","#c7e7d8","#d9d3ef","#fbe7b4","#f9cfc0"];
 
-let albumIdx = parseInt(localStorage.getItem("babyAlbum.idx")||"0",10);
-if(isNaN(albumIdx)||albumIdx<0||albumIdx>=ALBUMS.length) albumIdx=0;
-function curFolderId(){ return ALBUMS[albumIdx].id; }
-function metaKey(){ return META_KEY+"."+albumIdx; }
-
-let meta = loadMeta();      // {name, comments:{date:[...]}, updatedAt}
-let photos = [];            // 드라이브에서 가져온 사진 목록 [{id,date,thumbBase,localThumb,uploading}]
+let rootId=null, albums=[], albumIdx=0;   // albums: [{id,name}]
+let meta = {comments:{}, updatedAt:0};
+let photos = [];
+let metaFileId=null;
 let tokenClient=null, accessToken=null, folderId=null, metaSync=null;
 const expandedDays = new Set();
 const PREVIEW_LIMIT = 4;
 
-/* ---------- 로컬 메타(이름·코멘트만, 매우 작음) ---------- */
+function curFolderId(){ return albums[albumIdx] ? albums[albumIdx].id : null; }
+function curAlbumName(){ return albums[albumIdx] ? albums[albumIdx].name : "우리 아기 앨범"; }
+function metaKey(){ return META_KEY+"."+(curFolderId()||"none"); }
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+/* ---------- 로컬 메타(코멘트만) ---------- */
 function loadMeta(){
-  try{ const o=JSON.parse(localStorage.getItem(metaKey())||"null"); if(o&&o.name) return o; }catch(e){}
-  return { name:ALBUMS[albumIdx].name, comments:{}, updatedAt:0 };
+  try{ const o=JSON.parse(localStorage.getItem(metaKey())||"null"); if(o&&o.comments) return o; }catch(e){}
+  return { comments:{}, updatedAt:0 };
 }
 function saveMetaLocal(){ try{ localStorage.setItem(metaKey(), JSON.stringify(meta)); }catch(e){} }
 
 /* ---------- 구글 토큰 ---------- */
 function driveConfigured(){ return CLIENT_ID && !CLIENT_ID.startsWith("여기에"); }
 function driveConnected(){ return localStorage.getItem(FLAG_KEY)==="1"; }
-function storeToken(resp){
-  accessToken = resp.access_token;
-  const e = Date.now() + ((resp.expires_in?resp.expires_in:3500)*1000) - 60000;
-  try{ localStorage.setItem(TOKEN_KEY, JSON.stringify({t:accessToken,e})); }catch(_){}
-}
-function loadCachedToken(){
-  try{ const o=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null"); if(o&&o.t&&o.e>Date.now()){accessToken=o.t;return true;} }catch(e){}
-  return false;
-}
+function storeToken(resp){ accessToken=resp.access_token; const e=Date.now()+((resp.expires_in?resp.expires_in:3500)*1000)-60000; try{ localStorage.setItem(TOKEN_KEY,JSON.stringify({t:accessToken,e})); }catch(_){} }
+function loadCachedToken(){ try{ const o=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null"); if(o&&o.t&&o.e>Date.now()){accessToken=o.t;return true;} }catch(e){} return false; }
 function haveToken(){ return !!accessToken || loadCachedToken(); }
+function authHead(){ return {Authorization:"Bearer "+accessToken}; }
 function whenGoogleReady(cb){
   if(window.google&&google.accounts&&google.accounts.oauth2) return cb();
-  let n=0; const t=setInterval(()=>{
-    if(window.google&&google.accounts&&google.accounts.oauth2){clearInterval(t);cb();}
-    else if(++n>50){clearInterval(t);}
-  },150);
+  let n=0; const t=setInterval(()=>{ if(window.google&&google.accounts&&google.accounts.oauth2){clearInterval(t);cb();} else if(++n>50){clearInterval(t);} },150);
 }
 function getToken(interactive){
   return new Promise((resolve,reject)=>{
     if(!driveConfigured()) return reject("noconfig");
     if(!window.google||!google.accounts) return reject("nogis");
-    if(!tokenClient){
-      tokenClient = google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:DRIVE_SCOPE,callback:()=>{},error_callback:()=>{}});
-    }
+    if(!tokenClient) tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:DRIVE_SCOPE,callback:()=>{},error_callback:()=>{}});
     let settled=false;
-    tokenClient.callback = (resp)=>{
-      if(settled) return; settled=true;
-      if(resp&&resp.access_token){ storeToken(resp); resolve(accessToken); } else reject(resp||"noresp");
-    };
-    tokenClient.error_callback = (err)=>{ if(settled) return; settled=true; reject(err||"popup"); };
-    try{ tokenClient.requestAccessToken({prompt: interactive?"consent":""}); }
-    catch(e){ if(!settled){ settled=true; reject(e); } }
+    tokenClient.callback=(resp)=>{ if(settled)return; settled=true; if(resp&&resp.access_token){storeToken(resp);resolve(accessToken);} else reject(resp||"noresp"); };
+    tokenClient.error_callback=(err)=>{ if(settled)return; settled=true; reject(err||"popup"); };
+    try{ tokenClient.requestAccessToken({prompt:interactive?"consent":""}); }catch(e){ if(!settled){settled=true;reject(e);} }
   });
 }
-function authHead(){ return {Authorization:"Bearer "+accessToken}; }
 
-/* ---------- 드라이브 API ---------- */
-async function ensureFolder(){
-  folderId = curFolderId();
-  if(!folderId) throw new Error("no-folder");
-  return folderId;
+/* ---------- 메인 폴더 / 앨범(하위 폴더) ---------- */
+async function resolveRoot(){
+  let id = localStorage.getItem(ROOT_KEY) || "";
+  if(id){
+    const r=await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?fields=id,trashed&"+ALLDRIVES,{headers:authHead()});
+    if(r.ok){ const j=await r.json(); if(!j.trashed){ rootId=id; return rootId; } }
+  }
+  // 내 드라이브에서 ROOT_NAME 폴더 찾기/만들기
+  const q=encodeURIComponent("name='"+ROOT_NAME+"' and mimeType='"+FOLDER_MIME+"' and 'root' in parents and trashed=false");
+  const r=await fetch("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id)&"+ALLDRIVES,{headers:authHead()});
+  const j=await r.json();
+  if(j.files&&j.files[0]) rootId=j.files[0].id;
+  else{
+    const cr=await fetch("https://www.googleapis.com/drive/v3/files?"+ALLDRIVES,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authHead()),body:JSON.stringify({name:ROOT_NAME,mimeType:FOLDER_MIME})});
+    rootId=(await cr.json()).id;
+  }
+  localStorage.setItem(ROOT_KEY, rootId);
+  return rootId;
+}
+async function listAlbums(){
+  const q=encodeURIComponent("'"+rootId+"' in parents and mimeType='"+FOLDER_MIME+"' and trashed=false");
+  const r=await fetch("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id,name)&orderBy=name&"+ALLDRIVES,{headers:authHead()});
+  if(!r.ok) throw new Error("albums "+r.status);
+  const j=await r.json();
+  albums=(j.files||[]).map(f=>({id:f.id,name:f.name}));
+  const savedId=localStorage.getItem(ALBUMID_KEY);
+  const i=albums.findIndex(a=>a.id===savedId);
+  albumIdx = i>=0?i:0;
+}
+async function createAlbum(name){
+  const cr=await fetch("https://www.googleapis.com/drive/v3/files?"+ALLDRIVES,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authHead()),body:JSON.stringify({name,mimeType:FOLDER_MIME,parents:[rootId]})});
+  const j=await cr.json();
+  albums.push({id:j.id,name}); albums.sort((a,b)=>a.name.localeCompare(b.name));
+  albumIdx=albums.findIndex(a=>a.id===j.id);
+  localStorage.setItem(ALBUMID_KEY, j.id);
+  return j.id;
 }
 
-// 폴더의 사진 목록을 드라이브에서 직접 조회(페이지네이션) — 거대 JSON 없음
+/* ---------- 드라이브 사진/메타 API ---------- */
 async function listPhotos(){
   const out=[]; let pageToken="";
   do{
-    const q = encodeURIComponent("'"+folderId+"' in parents and trashed=false and mimeType contains 'image/'");
-    const url = "https://www.googleapis.com/drive/v3/files?q="+q+
-      "&fields=nextPageToken,files(id,name,thumbnailLink,appProperties,imageMediaMetadata/time,createdTime)"+
-      "&pageSize=200&orderBy=name&"+ALLDRIVES+(pageToken?("&pageToken="+pageToken):"");
-    const r = await fetch(url,{headers:authHead()});
+    const q=encodeURIComponent("'"+folderId+"' in parents and trashed=false and mimeType contains 'image/'");
+    const url="https://www.googleapis.com/drive/v3/files?q="+q+"&fields=nextPageToken,files(id,name,thumbnailLink,appProperties,imageMediaMetadata/time,createdTime)&pageSize=200&orderBy=name&"+ALLDRIVES+(pageToken?("&pageToken="+pageToken):"");
+    const r=await fetch(url,{headers:authHead()});
     if(!r.ok) throw new Error("list "+r.status);
-    const j = await r.json();
-    (j.files||[]).forEach(f=>{
-      out.push({ id:f.id, name:f.name, date:resolveDate(f), thumbBase:f.thumbnailLink||null, needsExif:isWeakDate(f) });
-    });
-    pageToken = j.nextPageToken||"";
+    const j=await r.json();
+    (j.files||[]).forEach(f=>{ out.push({id:f.id,name:f.name,date:resolveDate(f),thumbBase:f.thumbnailLink||null,needsExif:isWeakDate(f)}); });
+    pageToken=j.nextPageToken||"";
   }while(pageToken);
   return out;
 }
-// 드라이브가 날짜를 못 줘서 '올린 날짜'로 떨어진 경우 → 사진 파일에서 직접 EXIF를 읽어야 함
+function resolveDate(f){
+  if(f.appProperties && f.appProperties.albumDate) return f.appProperties.albumDate;
+  if(f.imageMediaMetadata && f.imageMediaMetadata.time){ const m=f.imageMediaMetadata.time.match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})/); if(m) return `${m[1]}-${m[2]}-${m[3]}`; }
+  const fn=dateFromName(f.name); if(fn) return fn;
+  if(f.createdTime) return f.createdTime.slice(0,10);
+  return todayStr();
+}
 function isWeakDate(f){
   if(f.appProperties && f.appProperties.albumDate) return false;
   if(f.imageMediaMetadata && f.imageMediaMetadata.time && /^\d{4}[:\-]\d{2}[:\-]\d{2}/.test(f.imageMediaMetadata.time)) return false;
   if(dateFromName(f.name)) return false;
   return true;
 }
-function resolveDate(f){
-  // 1) 앱이 기록한 촬영일  2) 구글이 읽은 EXIF 촬영일  3) 파일명 속 날짜  4) 올린 날짜
-  if(f.appProperties && f.appProperties.albumDate) return f.appProperties.albumDate;
-  if(f.imageMediaMetadata && f.imageMediaMetadata.time){
-    const m=f.imageMediaMetadata.time.match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})/);
-    if(m) return `${m[1]}-${m[2]}-${m[3]}`;
-  }
-  const fn=dateFromName(f.name);
-  if(fn) return fn;
-  if(f.createdTime) return f.createdTime.slice(0,10);
-  return todayStr();
-}
-function dateFromName(name){
-  if(!name) return null;
-  // 2026-04-30 / 20260430 / 2026_04_30 / IMG_20260430_... 등에서 날짜 추출
-  const m=name.match(/(20\d{2})[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])/);
-  return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
-}
-function sizedThumb(link, size){
-  if(!link) return "";
-  return /=s\d+/.test(link) ? link.replace(/=s\d+(-c)?/, "=s"+size) : (link+"=s"+size);
-}
+function dateFromName(name){ if(!name) return null; const m=name.match(/(20\d{2})[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])/); return m?`${m[1]}-${m[2]}-${m[3]}`:null; }
+function sizedThumb(link,size){ if(!link) return ""; return /=s\d+/.test(link)?link.replace(/=s\d+(-c)?/,"=s"+size):(link+"=s"+size); }
 
 async function uploadPhotoFile(blob, fileName, albumDate, mime){
-  const meta = {name:fileName, parents:[folderId]};
-  if(albumDate) meta.appProperties = {albumDate};
+  const m={name:fileName,parents:[folderId]}; if(albumDate) m.appProperties={albumDate};
   const boundary="bb"+Date.now()+Math.random().toString(36).slice(2);
-  const head = "--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(meta)+"\r\n"+
-               "--"+boundary+"\r\nContent-Type: "+(mime||"image/jpeg")+"\r\n\r\n";
-  const tail = "\r\n--"+boundary+"--";
-  const body = new Blob([head, blob, tail]);
-  const r = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,thumbnailLink,appProperties,createdTime&"+ALLDRIVES,{
-    method:"POST", headers:Object.assign({"Content-Type":"multipart/related; boundary="+boundary},authHead()), body
-  });
+  const head="--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(m)+"\r\n--"+boundary+"\r\nContent-Type: "+(mime||"image/jpeg")+"\r\n\r\n";
+  const body=new Blob([head, blob, "\r\n--"+boundary+"--"]);
+  const r=await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,thumbnailLink,appProperties,createdTime&"+ALLDRIVES,{method:"POST",headers:Object.assign({"Content-Type":"multipart/related; boundary="+boundary},authHead()),body});
   if(!r.ok) throw new Error("upload "+r.status);
   return await r.json();
 }
-const sleep = ms => new Promise(r=>setTimeout(r,ms));
-// 실패 시 재시도: 401(토큰만료)→재로그인, 403/429(속도제한)→잠시 후 재시도
-async function uploadWithRetry(blob, fileName, albumDate, mime){
-  for(let attempt=0; attempt<3; attempt++){
-    try{ return await uploadPhotoFile(blob, fileName, albumDate, mime); }
-    catch(err){
-      const s = String(err&&err.message||"");
-      if(attempt<2 && /40[13]|429/.test(s)){
-        if(/401/.test(s)){ try{ await getToken(false); }catch(_){} }
-        await sleep(1200*(attempt+1));
-        continue;
-      }
-      throw err;
-    }
+async function uploadWithRetry(blob,fileName,albumDate,mime){
+  for(let a=0;a<3;a++){
+    try{ return await uploadPhotoFile(blob,fileName,albumDate,mime); }
+    catch(err){ const s=String(err&&err.message||""); if(a<2 && /40[13]|429/.test(s)){ if(/401/.test(s)){ try{await getToken(false);}catch(_){} } await sleep(1200*(a+1)); continue; } throw err; }
   }
 }
-async function deletePhotoFile(id){
-  await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?"+ALLDRIVES,{method:"DELETE",headers:authHead()});
-}
+async function deletePhotoFile(id){ await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?"+ALLDRIVES,{method:"DELETE",headers:authHead()}); }
 
-/* 코멘트/이름 메타 파일(아주 작음) */
-let metaFileId=null;
 async function findMetaFile(){
   const q=encodeURIComponent("name='"+META_NAME+"' and '"+folderId+"' in parents and trashed=false");
   const r=await fetch("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id)&"+ALLDRIVES,{headers:authHead()});
@@ -327,414 +254,250 @@ async function downloadMeta(){
   if(!r.ok) return null; try{ return await r.json(); }catch(e){ return null; }
 }
 async function uploadMeta(){
-  const fileMeta = metaFileId?{}:{name:META_NAME, parents:[folderId]};
+  const fm=metaFileId?{}:{name:META_NAME,parents:[folderId]};
   const boundary="mm"+Date.now();
-  const body="--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(fileMeta)+"\r\n"+
-    "--"+boundary+"\r\nContent-Type: application/json\r\n\r\n"+JSON.stringify(meta)+"\r\n--"+boundary+"--";
-  const url = metaFileId
-    ? "https://www.googleapis.com/upload/drive/v3/files/"+metaFileId+"?uploadType=multipart&"+ALLDRIVES
-    : "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&"+ALLDRIVES;
+  const body="--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(fm)+"\r\n--"+boundary+"\r\nContent-Type: application/json\r\n\r\n"+JSON.stringify(meta)+"\r\n--"+boundary+"--";
+  const url=metaFileId?"https://www.googleapis.com/upload/drive/v3/files/"+metaFileId+"?uploadType=multipart&"+ALLDRIVES:"https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&"+ALLDRIVES;
   const r=await fetch(url,{method:metaFileId?"PATCH":"POST",headers:Object.assign({"Content-Type":"multipart/related; boundary="+boundary},authHead()),body});
   if(!r.ok) throw new Error("meta "+r.status);
   const j=await r.json(); if(j.id) metaFileId=j.id;
 }
 function scheduleMetaSync(){
   meta.updatedAt=Date.now(); saveMetaLocal();
-  if(!driveConnected()||!driveConfigured()) return;
+  if(!driveConnected()||!curFolderId()) return;
   clearTimeout(metaSync);
-  metaSync=setTimeout(()=>{
-    if(!haveToken()){ setSync("변경됨 · '☁ 구글 연결' 클릭", "err"); return; }
-    whenGoogleReady(async ()=>{
-      try{ if(!folderId) await ensureFolder(); if(metaFileId===null) await findMetaFile(); await uploadMeta(); setSync("구글 드라이브 연결됨 ✓", "ok"); }
-      catch(e){ setSync("저장 실패 · '☁ 구글 연결' 클릭", "err"); }
-    });
-  }, 1200);
+  metaSync=setTimeout(()=>{ if(!haveToken()){ setSync("변경됨 · '☁ 구글 연결'","err"); return; } whenGoogleReady(async()=>{ try{ if(metaFileId===null) await findMetaFile(); await uploadMeta(); setSync("구글 드라이브 연결됨 ✓","ok"); }catch(e){ setSync("저장 실패 · '☁ 구글 연결'","err"); } }); }, 1200);
 }
 
-/* ---------- 연결 / 새로고침 시 불러오기 ---------- */
+/* ---------- 연결 / 불러오기 ---------- */
 function connectDrive(){
-  if(!driveConfigured()){ toast("먼저 안내서대로 클라이언트 ID를 넣어주세요"); setSync("구글 연결 설정 필요 — 안내서 참고","err"); return; }
-  if(!curFolderId()){ setSync("이 앨범 폴더가 아직 설정되지 않았어요","err"); return; }
+  if(!driveConfigured()){ toast("클라이언트 ID 설정 필요"); setSync("설정 필요 — 안내서 참고","err"); return; }
   setSync("연결 중…");
-  const watchdog = setTimeout(()=>setSync("연결이 지연돼요 — 초대받은 구글 계정이 맞는지 확인하고 다시 '☁ 구글 연결'","err"), 30000);
-  whenGoogleReady(async ()=>{
-    try{
-      await getToken(true);
-      localStorage.setItem(FLAG_KEY,"1");
-      await refreshFromDrive();
-      clearTimeout(watchdog);
-      setSync("구글 드라이브 연결됨 ✓","ok");
-      toast("구글 드라이브에 연결됐어요 ☁️");
-    }catch(e){
-      clearTimeout(watchdog);
-      const code = (e&&(e.type||e.error))||"";
-      if(String(code).indexOf("popup")>=0) setSync("로그인 창이 닫혔어요 — 팝업 허용 후 다시 '☁ 구글 연결'","err");
-      else setSync("연결 실패 — 초대받은 계정으로 다시 '☁ 구글 연결'","err");
-    }
+  const watchdog=setTimeout(()=>setSync("연결이 지연돼요 — 초대받은 구글 계정인지 확인 후 다시 '☁ 구글 연결'","err"),30000);
+  whenGoogleReady(async()=>{
+    try{ await getToken(true); localStorage.setItem(FLAG_KEY,"1"); await refreshAll(); clearTimeout(watchdog); }
+    catch(e){ clearTimeout(watchdog); const c=String((e&&(e.type||e.error))||""); setSync(c.indexOf("popup")>=0?"로그인 창이 닫혔어요 — 팝업 허용 후 다시 '☁ 구글 연결'":"연결 실패 — 초대받은 계정으로 다시 '☁ 구글 연결'","err"); }
   });
 }
 function restoreDrive(){
   if(!driveConnected()||!driveConfigured()) return;
-  if(!haveToken()){ setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결' 클릭","err"); return; }
-  whenGoogleReady(async ()=>{
-    try{ await refreshFromDrive(); setSync("구글 드라이브 연결됨 ✓","ok"); }
-    catch(e){ setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결' 클릭","err"); }
-  });
+  if(!haveToken()){ setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결'","err"); return; }
+  whenGoogleReady(async()=>{ try{ await refreshAll(); }catch(e){ setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결'","err"); } });
 }
-async function refreshFromDrive(){
-  if(!curFolderId()){ setSync("이 앨범은 폴더가 아직 설정되지 않았어요 (코드에 폴더 ID 입력 필요)","err"); return; }
-  setSync("드라이브에서 불러오는 중…");
-  await ensureFolder();
+async function refreshAll(){
+  setSync("불러오는 중…");
+  await resolveRoot();
+  await listAlbums();
+  renderTabs();
+  if(!albums.length){ folderId=null; photos=[]; meta={comments:{},updatedAt:0}; render(); setSync("앨범이 없어요 — ‘＋ 새 앨범’으로 만들어주세요","ok"); return; }
+  await loadCurrentAlbum();
+}
+async function loadCurrentAlbum(){
+  folderId=curFolderId(); if(!folderId) return;
+  localStorage.setItem(ALBUMID_KEY, folderId);
+  meta=loadMeta(); metaFileId=null; photos=[]; expandedDays.clear();
+  render(); setSync("앨범 불러오는 중…");
   await findMetaFile();
-  const remote = await downloadMeta();
-  if(remote && (remote.updatedAt||0) >= (meta.updatedAt||0)){ meta = remote; saveMetaLocal(); }
-  const list = await listPhotos();
-  // 업로드 대기 중인(아직 드라이브에 없는) 임시 사진은 유지
-  const pending = photos.filter(p=>p.pending);
-  photos = list.concat(pending);
+  const remote=await downloadMeta();
+  if(remote && (remote.updatedAt||0)>=(meta.updatedAt||0)){ meta=remote; saveMetaLocal(); }
+  photos=await listPhotos();
   render();
   setSync("구글 드라이브 연결됨 ✓","ok");
-  resolvePhotoDates();   // 날짜를 못 읽은 사진은 파일에서 직접 EXIF 추출(백그라운드)
+  resolvePhotoDates();
 }
 
-/* 드라이브가 날짜를 못 준 사진 → 파일에서 EXIF 촬영일을 직접 읽고, 드라이브에 기록 */
+/* 날짜 못 읽은 사진 → 파일에서 직접 EXIF 추출 후 드라이브에 기록 */
 let exifBusy=false;
 async function ensureExifr(){ for(let i=0;i<40 && typeof exifr==="undefined";i++) await sleep(150); return typeof exifr!=="undefined"; }
-async function readExifDate(id, full){
-  const headers = full ? authHead() : Object.assign({Range:"bytes=0-1048575"}, authHead());
-  const r = await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?alt=media&"+ALLDRIVES, {headers});
+async function readExifDate(id,full){
+  const headers=full?authHead():Object.assign({Range:"bytes=0-1048575"},authHead());
+  const r=await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?alt=media&"+ALLDRIVES,{headers});
   if(!r.ok) return null;
-  const buf = await r.arrayBuffer();
-  try{
-    const ex = await exifr.parse(buf,{pick:["DateTimeOriginal","CreateDate","ModifyDate"]});
-    const dt = ex && (ex.DateTimeOriginal||ex.CreateDate||ex.ModifyDate);
-    if(dt){ const d=new Date(dt); if(!isNaN(d)) return dateFromTs(d.getTime()); }
-  }catch(_){}
+  try{ const ex=await exifr.parse(await r.arrayBuffer(),{pick:["DateTimeOriginal","CreateDate","ModifyDate"]}); const dt=ex&&(ex.DateTimeOriginal||ex.CreateDate||ex.ModifyDate); if(dt){ const d=new Date(dt); if(!isNaN(d)) return dateFromTs(d.getTime()); } }catch(_){}
   return null;
 }
-async function resolvePhotoDates(force){
-  if(exifBusy || !haveToken()) return;
-  const targets = photos.filter(p=> !p.uploading && (force || p.needsExif));
-  if(!targets.length) return;
-  if(!(await ensureExifr())){ setSync("날짜 읽기 라이브러리를 못 불러왔어요(인터넷 확인 후 새로고침)","err"); return; }
-  exifBusy=true;
-  let fixed=0, n=0;
+async function resolvePhotoDates(){
+  if(exifBusy||!haveToken()) return;
+  const targets=photos.filter(p=>p.needsExif&&!p.uploading); if(!targets.length) return;
+  if(!(await ensureExifr())) return;
+  exifBusy=true; let fixed=0,n=0;
   try{
     for(const p of targets){
-      n++;
-      if(n%5===0||n===targets.length) setSync(`사진 날짜 정리 중… ${n}/${targets.length}`);
-      try{
-        let ds = await readExifDate(p.id, false);   // 먼저 앞 1MB만
-        if(!ds) ds = await readExifDate(p.id, true); // 못 찾으면 전체 파일
-        if(ds){
-          if(ds!==p.date){ p.date=ds; fixed++; render(); }
-          patchAlbumDate(p.id, ds);
-        }
-      }catch(e){}
-      p.needsExif=false;
-      await sleep(50);
+      n++; if(n%5===0||n===targets.length) setSync(`사진 날짜 정리 중… ${n}/${targets.length}`);
+      try{ let ds=await readExifDate(p.id,false); if(!ds) ds=await readExifDate(p.id,true); if(ds){ if(ds!==p.date){p.date=ds;fixed++;render();} patchAlbumDate(p.id,ds); } }catch(e){}
+      p.needsExif=false; await sleep(50);
     }
-  }finally{
-    exifBusy=false;
-    if(fixed) render();
-    setSync(`날짜 정리 완료 — ${fixed}장 보정됨 · 구글 드라이브 연결됨 ✓`,"ok");
-  }
+  }finally{ exifBusy=false; if(fixed) render(); setSync("구글 드라이브 연결됨 ✓","ok"); }
 }
-async function patchAlbumDate(id, date){
-  try{
-    await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?"+ALLDRIVES,{
-      method:"PATCH", headers:Object.assign({"Content-Type":"application/json"},authHead()),
-      body:JSON.stringify({appProperties:{albumDate:date}})
-    });
-  }catch(e){}
-}
+async function patchAlbumDate(id,date){ try{ await fetch("https://www.googleapis.com/drive/v3/files/"+id+"?"+ALLDRIVES,{method:"PATCH",headers:Object.assign({"Content-Type":"application/json"},authHead()),body:JSON.stringify({appProperties:{albumDate:date}})}); }catch(e){} }
 
 /* ---------- 사진 추가 ---------- */
-let pendingFailures = [];   // 업로드 실패한 파일들(다시 올리기용)
-let uploadBusy = false;
-
-document.getElementById("addBtn").onclick = ()=> document.getElementById("fileInput").click();
-document.getElementById("fileInput").onchange = (e)=>{
-  const files=[...e.target.files]; e.target.value="";
-  uploadFiles(files);
-};
-document.getElementById("retryBtn").onclick = ()=>{
-  if(!pendingFailures.length) return;
-  uploadFiles(pendingFailures.slice());
-};
-function showRetry(count){
-  const b=document.getElementById("retryBtn");
-  if(count>0){ b.textContent=`⟳ 실패분 다시 올리기 (${count})`; b.style.display="inline-flex"; }
-  else b.style.display="none";
-}
-
-// 한 장 업로드 → 성공 true / 실패 false
+let pendingFailures=[], uploadBusy=false;
+document.getElementById("addBtn").onclick=()=>{ if(!curFolderId()){ toast("먼저 앨범을 선택/생성해주세요"); return; } document.getElementById("fileInput").click(); };
+document.getElementById("fileInput").onchange=(e)=>{ const files=[...e.target.files]; e.target.value=""; uploadFiles(files); };
+document.getElementById("retryBtn").onclick=()=>{ if(pendingFailures.length) uploadFiles(pendingFailures.slice()); };
+function showRetry(c){ const b=document.getElementById("retryBtn"); if(c>0){ b.textContent=`⟳ 실패분 다시 올리기 (${c})`; b.style.display="inline-flex"; } else b.style.display="none"; }
 async function uploadOne(f){
-  const det = await getPhotoDate(f);                 // {date, exif}
-  const tempId = "tmp_"+uid();
-  let localThumb=null, blob, mime, ext;
-  try{ blob = await compressToBlob(f, 1600, 0.82); mime="image/jpeg"; ext="jpg"; localThumb=URL.createObjectURL(blob); }
-  catch(_){ blob = f; mime = f.type || "application/octet-stream"; ext = (f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg"; }
-  photos.push({id:tempId, date:det.date, thumbBase:null, localThumb, uploading:true}); render();
+  const det=await getPhotoDate(f);
+  const tempId="tmp_"+uid(); let localThumb=null,blob,mime,ext;
+  try{ blob=await compressToBlob(f,1600,0.82); mime="image/jpeg"; ext="jpg"; localThumb=URL.createObjectURL(blob); }
+  catch(_){ blob=f; mime=f.type||"application/octet-stream"; ext=(f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg"; }
+  photos.push({id:tempId,date:det.date,thumbBase:null,localThumb,uploading:true}); render();
   try{
-    const up = await uploadWithRetry(blob, det.date+"_"+uid()+"."+ext, det.date, mime); // 촬영일 없으면 저장(다운로드)일 기록
-    const idx = photos.findIndex(p=>p.id===tempId);
-    if(idx>=0) photos[idx] = {id:up.id, date:(up.appProperties&&up.appProperties.albumDate)||det.date, thumbBase:up.thumbnailLink||null, localThumb};
+    const up=await uploadWithRetry(blob,det.date+"_"+uid()+"."+ext,det.date,mime);
+    const idx=photos.findIndex(p=>p.id===tempId);
+    if(idx>=0) photos[idx]={id:up.id,date:(up.appProperties&&up.appProperties.albumDate)||det.date,thumbBase:up.thumbnailLink||null,localThumb};
     render(); return true;
-  }catch(err){
-    photos = photos.filter(p=>p.id!==tempId); render(); return false;
-  }
+  }catch(err){ photos=photos.filter(p=>p.id!==tempId); render(); return false; }
 }
-
-// 여러 장 업로드 — 실패분은 자동으로 최대 3차까지 재시도, 그래도 남으면 '다시 올리기'로 보관
 function uploadFiles(input){
-  let files = (input||[]).filter(f=> f.type.startsWith("image/") || /\.(heic|heif|jpe?g|png|gif|webp)$/i.test(f.name));
+  let files=(input||[]).filter(f=> f.type.startsWith("image/") || /\.(heic|heif|jpe?g|png|gif|webp)$/i.test(f.name));
   if(!files.length) return;
-  if(!curFolderId()){ toast("이 앨범 폴더가 아직 설정되지 않았어요"); return; }
-  if(!driveConnected()){ toast("먼저 '☁ 구글 연결'을 눌러주세요"); return; }
-  if(!haveToken()){ toast("구글 연결이 만료됐어요 — '☁ 구글 연결' 다시 클릭"); setSync("구글 다시 연결 필요 — '☁ 구글 연결'","err"); return; }
-  if(uploadBusy){ toast("이미 업로드 중이에요 — 끝난 뒤 다시 시도해주세요"); return; }
-  uploadBusy = true; showRetry(0);
-  const totalAll = files.length;
-  whenGoogleReady(async ()=>{
-    try{ if(!folderId) await ensureFolder(); }catch(_){}
+  if(!curFolderId()){ toast("먼저 앨범을 선택/생성해주세요"); return; }
+  if(!driveConnected()){ toast("먼저 '☁ 구글 연결'"); return; }
+  if(!haveToken()){ toast("구글 연결 만료 — '☁ 구글 연결' 다시"); setSync("구글 다시 연결 필요","err"); return; }
+  if(uploadBusy){ toast("이미 업로드 중이에요"); return; }
+  uploadBusy=true; showRetry(0);
+  const totalAll=files.length;
+  whenGoogleReady(async()=>{
+    folderId=curFolderId();
     let done=0, queue=files;
     for(let pass=0; pass<3 && queue.length; pass++){
       if(pass>0){ setSync(`실패분 다시 시도(${pass}차)… ${queue.length}장 남음`); await sleep(2500); }
       const next=[];
-      for(const f of queue){
-        setSync(`올리는 중… ${done+1}/${totalAll}`);
-        const ok = await uploadOne(f);
-        if(ok) done++; else next.push(f);
-        await sleep(90);
-      }
-      queue = next;
+      for(const f of queue){ setSync(`올리는 중… ${done+1}/${totalAll}`); const ok=await uploadOne(f); if(ok) done++; else next.push(f); await sleep(90); }
+      queue=next;
     }
-    uploadBusy = false;
-    if(queue.length){
-      pendingFailures = queue;
-      showRetry(queue.length);
-      setSync(`완료 ${done}/${totalAll} · ${queue.length}장 실패 — '⟳ 실패분 다시 올리기'를 눌러주세요`, "err");
-      toast(`${queue.length}장 실패 — 다시 올리기로 재시도하세요`);
-    }else{
-      pendingFailures = []; showRetry(0);
-      setSync("구글 드라이브 연결됨 ✓","ok");
-      toast(`${done}장 모두 올렸어요 💕`);
-    }
+    uploadBusy=false;
+    if(queue.length){ pendingFailures=queue; showRetry(queue.length); setSync(`완료 ${done}/${totalAll} · ${queue.length}장 실패 — '⟳ 실패분 다시 올리기'`,"err"); toast(`${queue.length}장 실패`); }
+    else{ pendingFailures=[]; showRetry(0); setSync("구글 드라이브 연결됨 ✓","ok"); toast(`${done}장 모두 올렸어요 💕`); }
   });
 }
-async function flushPendingUploads(){ /* 현재 구조에선 연결 상태에서만 추가하므로 비워둠 */ }
 
 /* ---------- 렌더 ---------- */
+function renderTabs(){
+  const el=document.getElementById("tabs");
+  if(!driveConnected()){ el.innerHTML=""; return; }
+  el.innerHTML = albums.map((a,i)=>`<button class="tab ${i===albumIdx?'active':''}" data-album="${i}">${esc(a.name)}</button>`).join("")
+    + `<button class="tab newalbum" id="newAlbumBtn">＋ 새 앨범</button>`;
+}
 function render(){
   const album=document.getElementById("album"), empty=document.getElementById("empty");
-  document.getElementById("babyNameText").textContent = meta.name;
+  document.getElementById("babyNameText").textContent = driveConnected()? curAlbumName() : "우리 아기 앨범";
+  if(!driveConnected()){
+    album.innerHTML=""; empty.style.display="block";
+    empty.innerHTML=`<div class="big">🔒</div><div>구글 계정으로 연결하면<br>앨범과 사진이 보여요.<br><br>위의 <b>☁ 구글 연결</b>을 눌러주세요.</div>`;
+    return;
+  }
   const groups={};
   for(const p of photos){ (groups[p.date] ||= []).push(p); }
   for(const d in meta.comments){ if((meta.comments[d]||[]).length && !groups[d]) groups[d]=[]; }
-  const dates=Object.keys(groups).sort((a,b)=> b.localeCompare(a));
-  empty.style.display = dates.length?"none":"block";
-  album.innerHTML="";
+  const dates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+  if(!dates.length){
+    album.innerHTML=""; empty.style.display="block";
+    empty.innerHTML=`<div class="big">🍼</div><div>이 앨범엔 아직 사진이 없어요.<br><b>＋ 사진 추가</b>로 올려보세요!</div>`;
+    return;
+  }
+  empty.style.display="none"; album.innerHTML="";
   dates.forEach((d,i)=>{
     const ps=groups[d], cs=meta.comments[d]||[];
     const day=document.createElement("div"); day.className="day";
     let photoHTML="";
     if(ps.length){
-      const expanded=expandedDays.has(d);
-      const collapsed=!expanded && ps.length>PREVIEW_LIMIT;
-      const show=collapsed?ps.slice(0,PREVIEW_LIMIT):ps;
-      const hidden=ps.length-PREVIEW_LIMIT;
+      const expanded=expandedDays.has(d), collapsed=!expanded&&ps.length>PREVIEW_LIMIT;
+      const show=collapsed?ps.slice(0,PREVIEW_LIMIT):ps, hidden=ps.length-PREVIEW_LIMIT;
       photoHTML=`<div class="grid">`+show.map((p,idx)=>{
-        const isLast=collapsed && idx===PREVIEW_LIMIT-1;
+        const isLast=collapsed&&idx===PREVIEW_LIMIT-1;
         const overlay=isLast?`<button class="more" data-more="${d}"><b>+${hidden}</b><span>모두 보기</span></button>`:"";
-        const src=p.localThumb || sizedThumb(p.thumbBase,400) || "";
-        return `<div class="photo ${p.uploading?'uploading':''}" data-pid="${p.id}">
-          <img src="${src}" loading="lazy" alt=""/>
-          ${overlay}
-          ${p.uploading?"":`<button class="del" data-del="${p.id}" title="삭제">×</button>`}
-        </div>`;
+        const src=p.localThumb||sizedThumb(p.thumbBase,400)||"";
+        return `<div class="photo ${p.uploading?'uploading':''}" data-pid="${p.id}"><img src="${src}" loading="lazy" alt=""/>${overlay}${p.uploading?"":`<button class="del" data-del="${p.id}" title="삭제">×</button>`}</div>`;
       }).join("")+`</div>`;
-      if(expanded && ps.length>PREVIEW_LIMIT) photoHTML+=`<button class="collapse" data-collapse="${d}">접기 ▲</button>`;
+      if(expanded&&ps.length>PREVIEW_LIMIT) photoHTML+=`<button class="collapse" data-collapse="${d}">접기 ▲</button>`;
     }
-    let commentHTML=cs.map(c=>`
-      <div class="comment"><div class="ava">💬</div>
-        <div class="body"><div class="txt">${esc(c.text)}</div><div class="time">${c.time}</div></div>
-        <button class="cdel" data-cdel="${c.id}" data-cdate="${d}">삭제</button></div>`).join("");
-    day.innerHTML=`
-      <div class="day-head">
-        <span class="day-dot" style="background:${dotColors[i%dotColors.length]}"></span>
-        <div><div class="day-date">${fmtDate(d)}</div>
-        <div class="day-sub">사진 ${ps.length}장 · 코멘트 ${cs.length}개</div></div>
-        <span class="day-count">${ps.length}📷</span>
-      </div>
-      ${photoHTML}
-      <div class="comments">${commentHTML}
-        <div class="addcomment">
-          <input type="text" placeholder="이 날의 이야기를 남겨보세요…" data-cinput="${d}" />
-          <button data-cadd="${d}">남기기</button>
-        </div>
-      </div>`;
+    const commentHTML=cs.map(c=>`<div class="comment"><div class="ava">💬</div><div class="body"><div class="txt">${esc(c.text)}</div><div class="time">${c.time}</div></div><button class="cdel" data-cdel="${c.id}" data-cdate="${d}">삭제</button></div>`).join("");
+    day.innerHTML=`<div class="day-head"><span class="day-dot" style="background:${dotColors[i%dotColors.length]}"></span><div><div class="day-date">${fmtDate(d)}</div><div class="day-sub">사진 ${ps.length}장 · 코멘트 ${cs.length}개</div></div><span class="day-count">${ps.length}📷</span></div>${photoHTML}<div class="comments">${commentHTML}<div class="addcomment"><input type="text" placeholder="이 날의 이야기를 남겨보세요…" data-cinput="${d}" /><button data-cadd="${d}">남기기</button></div></div>`;
     album.appendChild(day);
   });
 }
-function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
-/* ---------- 클릭 처리 ---------- */
+/* ---------- 클릭/입력 ---------- */
+document.getElementById("tabs").addEventListener("click",(e)=>{
+  if(e.target.closest("#newAlbumBtn")){ promptNewAlbum(); return; }
+  const b=e.target.closest("[data-album]"); if(b) switchAlbum(parseInt(b.getAttribute("data-album"),10));
+});
+function switchAlbum(i){
+  if(i===albumIdx){ if(driveConnected()&&haveToken()) loadCurrentAlbum(); return; }
+  albumIdx=i; renderTabs(); loadCurrentAlbum();
+}
+function promptNewAlbum(){
+  if(!driveConnected()||!haveToken()){ setSync("먼저 '☁ 구글 연결'","err"); return; }
+  const name=(prompt("새 앨범 이름을 입력하세요 (구글 드라이브에 폴더로 만들어져요)","")||"").trim();
+  if(!name) return;
+  setSync("앨범 만드는 중…");
+  whenGoogleReady(async()=>{ try{ await createAlbum(name); renderTabs(); await loadCurrentAlbum(); toast("새 앨범을 만들었어요 📁"); }catch(e){ setSync("앨범 생성 실패 — 다시 시도","err"); } });
+}
 document.getElementById("album").addEventListener("click",(e)=>{
-  const more=e.target.closest("[data-more]");
-  if(more){ expandedDays.add(more.getAttribute("data-more")); render(); return; }
-  const collapse=e.target.closest("[data-collapse]");
-  if(collapse){ expandedDays.delete(collapse.getAttribute("data-collapse")); render(); return; }
-  const del=e.target.closest("[data-del]");
-  if(del){ deletePhoto(del.getAttribute("data-del")); return; }
-  const cdel=e.target.closest("[data-cdel]");
-  if(cdel){ const d=cdel.getAttribute("data-cdate"); meta.comments[d]=(meta.comments[d]||[]).filter(c=>c.id!==cdel.getAttribute("data-cdel")); scheduleMetaSync(); render(); return; }
-  const cadd=e.target.closest("[data-cadd]");
-  if(cadd){ addComment(cadd.getAttribute("data-cadd")); return; }
-  const tile=e.target.closest(".photo");
-  if(tile){ const p=photos.find(x=>x.id===tile.getAttribute("data-pid")); if(p&&!p.uploading) openLB(p); }
+  const more=e.target.closest("[data-more]"); if(more){ expandedDays.add(more.getAttribute("data-more")); render(); return; }
+  const collapse=e.target.closest("[data-collapse]"); if(collapse){ expandedDays.delete(collapse.getAttribute("data-collapse")); render(); return; }
+  const del=e.target.closest("[data-del]"); if(del){ deletePhoto(del.getAttribute("data-del")); return; }
+  const cdel=e.target.closest("[data-cdel]"); if(cdel){ const d=cdel.getAttribute("data-cdate"); meta.comments[d]=(meta.comments[d]||[]).filter(c=>c.id!==cdel.getAttribute("data-cdel")); scheduleMetaSync(); render(); return; }
+  const cadd=e.target.closest("[data-cadd]"); if(cadd){ addComment(cadd.getAttribute("data-cadd")); return; }
+  const tile=e.target.closest(".photo"); if(tile){ const p=photos.find(x=>x.id===tile.getAttribute("data-pid")); if(p&&!p.uploading) openLB(p); }
 });
-document.getElementById("album").addEventListener("keydown",(e)=>{
-  const inp=e.target.getAttribute&&e.target.getAttribute("data-cinput");
-  if(inp&&e.key==="Enter") addComment(inp);
-});
+document.getElementById("album").addEventListener("keydown",(e)=>{ const inp=e.target.getAttribute&&e.target.getAttribute("data-cinput"); if(inp&&e.key==="Enter") addComment(inp); });
 function addComment(date){
-  const input=document.querySelector(`[data-cinput="${date}"]`);
-  const text=(input.value||"").trim(); if(!text) return;
-  const now=new Date();
-  const time=`${now.getMonth()+1}월 ${now.getDate()}일 ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
-  (meta.comments[date] ||= []).push({id:uid(),text,time});
-  scheduleMetaSync(); render();
+  const input=document.querySelector(`[data-cinput="${date}"]`); const text=(input.value||"").trim(); if(!text) return;
+  const now=new Date(); const time=`${now.getMonth()+1}월 ${now.getDate()}일 ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  (meta.comments[date] ||= []).push({id:uid(),text,time}); scheduleMetaSync(); render();
 }
 async function deletePhoto(id){
   if(!confirm("이 사진을 삭제할까요? (구글 드라이브에서도 삭제돼요)")) return;
-  const p=photos.find(x=>x.id===id);
-  photos=photos.filter(x=>x.id!==id); render();
-  try{ if(p && !p.uploading && haveToken()) await deletePhotoFile(id); }catch(e){}
+  const p=photos.find(x=>x.id===id); photos=photos.filter(x=>x.id!==id); render();
+  try{ if(p&&!p.uploading&&haveToken()) await deletePhotoFile(id); }catch(e){}
 }
-
-/* 라이트박스 — 큰 화면은 드라이브 썸네일을 크게 요청 */
-function openLB(p){
-  const big = p.thumbBase ? sizedThumb(p.thumbBase,1600) : (p.localThumb||"");
-  document.getElementById("lbImg").src=big;
-  document.getElementById("lb").classList.add("show");
-}
+function openLB(p){ document.getElementById("lbImg").src = p.thumbBase?sizedThumb(p.thumbBase,1600):(p.localThumb||""); document.getElementById("lb").classList.add("show"); }
 document.getElementById("lbX").onclick=()=>document.getElementById("lb").classList.remove("show");
 document.getElementById("lb").onclick=(e)=>{ if(e.target.id==="lb") e.currentTarget.classList.remove("show"); };
 
-/* 이름 편집 */
-document.getElementById("babyName").onclick=()=>{ document.getElementById("namePick").value=meta.name; showModal("nameModal"); setTimeout(()=>document.getElementById("namePick").focus(),50); };
-document.getElementById("nameOk").onclick=()=>{ const v=document.getElementById("namePick").value.trim(); if(v){ meta.name=v; scheduleMetaSync(); render(); } hideModal("nameModal"); };
-document.getElementById("nameCancel").onclick=()=>hideModal("nameModal");
-
-/* 연결 / 새로고침 버튼 */
+/* 버튼 */
 document.getElementById("syncBtn").onclick=()=>connectDrive();
-document.getElementById("refreshBtn").onclick=()=>{
-  if(!curFolderId()){ setSync("이 앨범 폴더가 아직 설정되지 않았어요","err"); return; }
-  if(!driveConnected()){ connectDrive(); return; }
-  if(!haveToken()){ setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결'","err"); return; }
-  restoreDrive();
+document.getElementById("refreshBtn").onclick=()=>{ if(!driveConnected()){ connectDrive(); return; } if(!haveToken()){ setSync("구글 다시 연결 — '☁ 구글 연결'","err"); return; } refreshAll(); };
+document.getElementById("settingsBtn").onclick=()=>{
+  const cur=localStorage.getItem(ROOT_KEY)||"";
+  const msg="메인 폴더 ID를 입력하세요.\n· 가족이 공유해준 폴더 ID를 넣으면 그 앨범 모음이 보여요.\n· 비워서 확인하면 내 드라이브에 '"+ROOT_NAME+"' 폴더를 자동으로 씁니다.\n\n현재 메인 폴더 ID: "+(cur||"(자동)");
+  const v=prompt(msg, cur);
+  if(v===null) return;
+  const id=v.trim();
+  if(id) localStorage.setItem(ROOT_KEY,id); else localStorage.removeItem(ROOT_KEY);
+  rootId=null; albums=[]; localStorage.removeItem(ALBUMID_KEY);
+  if(driveConnected()&&haveToken()) refreshAll(); else setSync("메인 폴더가 설정됐어요 — '☁ 구글 연결'을 눌러주세요");
 };
-
-/* ---------- 앨범 탭 전환 ---------- */
-function renderTabs(){
-  const el=document.getElementById("tabs");
-  el.innerHTML=ALBUMS.map((a,i)=>`<button class="tab ${i===albumIdx?'active':''}" data-album="${i}">${esc(a.name)}</button>`).join("");
-}
-document.getElementById("tabs").addEventListener("click",(e)=>{
-  const b=e.target.closest("[data-album]"); if(!b) return;
-  switchAlbum(parseInt(b.getAttribute("data-album"),10));
-});
-function switchAlbum(i){
-  if(i===albumIdx){ if(driveConnected()&&haveToken()) restoreDrive(); return; }  // 같은 탭 다시 누르면 새로고침
-  albumIdx=i; try{ localStorage.setItem("babyAlbum.idx",String(i)); }catch(e){}
-  meta=loadMeta(); metaFileId=null; folderId=null; photos=[]; expandedDays.clear();
-  renderTabs(); render();
-  if(!curFolderId()){ setSync("이 앨범 폴더가 아직 설정되지 않았어요 (코드에 폴더 ID 입력 필요)","err"); return; }
-  if(driveConnected() && haveToken()) restoreDrive();
-  else if(driveConnected()) setSync("구글 다시 연결이 필요해요 — '☁ 구글 연결' 클릭","err");
-  else setSync("'☁ 구글 연결'을 누르면 사진이 보여요");
-}
 
 /* ---------- 유틸 ---------- */
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
-function fmtDate(d){
-  const [y,m,day]=d.split("-").map(Number);
-  const wk=["일","월","화","수","목","금","토"][new Date(y,m-1,day).getDay()];
-  return `${y}년 ${m}월 ${day}일 (${wk})`;
-}
+function fmtDate(d){ const [y,m,day]=d.split("-").map(Number); const wk=["일","월","화","수","목","금","토"][new Date(y,m-1,day).getDay()]; return `${y}년 ${m}월 ${day}일 (${wk})`; }
 function todayStr(){ const t=new Date(),p=n=>String(n).padStart(2,"0"); return `${t.getFullYear()}-${p(t.getMonth()+1)}-${p(t.getDate())}`; }
 function dateFromTs(ms){ const t=new Date(ms),p=n=>String(n).padStart(2,"0"); return `${t.getFullYear()}-${p(t.getMonth()+1)}-${p(t.getDate())}`; }
-
-/* 사진의 촬영일(EXIF) 우선, 없으면 파일 저장일 → {date, exif}.
-   exifr(HEIC 지원) 우선 사용, 없으면 JPEG 직접 파싱 */
 async function getPhotoDate(file){
-  if(typeof exifr!=="undefined"){
-    try{
-      const ex = await exifr.parse(file,{pick:["DateTimeOriginal","CreateDate","ModifyDate"]});
-      const dt = ex && (ex.DateTimeOriginal||ex.CreateDate||ex.ModifyDate);
-      if(dt){ const d=new Date(dt); if(!isNaN(d)) return {date:dateFromTs(d.getTime()), exif:true}; }
-    }catch(_){}
-  }
-  return await new Promise(res=>{
-    const r=new FileReader();
-    r.onload=()=>{ try{ const ex=parseExifDate(r.result); if(ex) return res({date:ex, exif:true});}catch(e){} res({date:dateFromTs(file.lastModified||Date.now()), exif:false}); };
-    r.onerror=()=>res({date:dateFromTs(file.lastModified||Date.now()), exif:false});
-    r.readAsArrayBuffer(file.slice(0,256*1024));
-  });
+  if(typeof exifr!=="undefined"){ try{ const ex=await exifr.parse(file,{pick:["DateTimeOriginal","CreateDate","ModifyDate"]}); const dt=ex&&(ex.DateTimeOriginal||ex.CreateDate||ex.ModifyDate); if(dt){ const d=new Date(dt); if(!isNaN(d)) return {date:dateFromTs(d.getTime()),exif:true}; } }catch(_){} }
+  return await new Promise(res=>{ const r=new FileReader(); r.onload=()=>{ try{ const ex=parseExifDate(r.result); if(ex) return res({date:ex,exif:true}); }catch(e){} res({date:dateFromTs(file.lastModified||Date.now()),exif:false}); }; r.onerror=()=>res({date:dateFromTs(file.lastModified||Date.now()),exif:false}); r.readAsArrayBuffer(file.slice(0,256*1024)); });
 }
-function parseExifDate(buffer){
-  const v=new DataView(buffer); if(v.getUint16(0)!==0xFFD8) return null;
-  const len=v.byteLength; let off=2;
-  while(off+4<len){ const m=v.getUint16(off); if(m===0xFFE1) return readExif(v,off+4); if((m&0xFF00)!==0xFF00) break; off+=2+v.getUint16(off+2); }
-  return null;
-}
-function readExif(view,start){
-  if(view.getUint32(start)!==0x45786966) return null;
-  const tiff=start+6, little=view.getUint16(tiff)===0x4949;
-  const u16=o=>view.getUint16(o,little), u32=o=>view.getUint32(o,little);
-  if(u16(tiff+2)!==0x002A) return null;
-  const ifd0=tiff+u32(tiff+4);
-  const readDir=dir=>{ const n=u16(dir),tags={}; for(let i=0;i<n;i++){const e=dir+2+i*12;tags[u16(e)]=e;} return {n,tags}; };
-  const asciiAt=eo=>{ const c=u32(eo+4); let vo=eo+8; if(c>4) vo=tiff+u32(eo+8); let s=""; for(let i=0;i<c-1;i++) s+=String.fromCharCode(view.getUint8(vo+i)); return s; };
-  const d0=readDir(ifd0); let ds=null;
-  if(d0.tags[0x8769]){ const ex=tiff+u32(d0.tags[0x8769]+8); const de=readDir(ex); if(de.tags[0x9003]) ds=asciiAt(de.tags[0x9003]); else if(de.tags[0x9004]) ds=asciiAt(de.tags[0x9004]); }
-  if(!ds && d0.tags[0x0132]) ds=asciiAt(d0.tags[0x0132]);
-  if(!ds) return null;
-  const m=ds.match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})/);
-  return m?`${m[1]}-${m[2]}-${m[3]}`:null;
-}
+function parseExifDate(buffer){ const v=new DataView(buffer); if(v.getUint16(0)!==0xFFD8) return null; const len=v.byteLength; let off=2; while(off+4<len){ const m=v.getUint16(off); if(m===0xFFE1) return readExif(v,off+4); if((m&0xFF00)!==0xFF00) break; off+=2+v.getUint16(off+2); } return null; }
+function readExif(view,start){ if(view.getUint32(start)!==0x45786966) return null; const tiff=start+6,little=view.getUint16(tiff)===0x4949; const u16=o=>view.getUint16(o,little),u32=o=>view.getUint32(o,little); if(u16(tiff+2)!==0x002A) return null; const ifd0=tiff+u32(tiff+4); const readDir=dir=>{ const n=u16(dir),tags={}; for(let i=0;i<n;i++){const e=dir+2+i*12;tags[u16(e)]=e;} return {n,tags}; }; const asciiAt=eo=>{ const c=u32(eo+4); let vo=eo+8; if(c>4) vo=tiff+u32(eo+8); let s=""; for(let i=0;i<c-1;i++) s+=String.fromCharCode(view.getUint8(vo+i)); return s; }; const d0=readDir(ifd0); let ds=null; if(d0.tags[0x8769]){ const ex=tiff+u32(d0.tags[0x8769]+8); const de=readDir(ex); if(de.tags[0x9003]) ds=asciiAt(de.tags[0x9003]); else if(de.tags[0x9004]) ds=asciiAt(de.tags[0x9004]); } if(!ds&&d0.tags[0x0132]) ds=asciiAt(d0.tags[0x0132]); if(!ds) return null; const m=ds.match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})/); return m?`${m[1]}-${m[2]}-${m[3]}`:null; }
+function compressToBlob(file,max,q){ return new Promise((res,rej)=>{ const img=new Image(),url=URL.createObjectURL(file); img.onload=()=>{ let {width:w,height:h}=img; if(w>h&&w>max){h=Math.round(h*max/w);w=max;} else if(h>=w&&h>max){w=Math.round(w*max/h);h=max;} const c=document.createElement("canvas"); c.width=w;c.height=h; c.getContext("2d").drawImage(img,0,0,w,h); URL.revokeObjectURL(url); c.toBlob(b=>b?res(b):rej("noblob"),"image/jpeg",q); }; img.onerror=()=>{URL.revokeObjectURL(url);rej("imgerr");}; img.src=url; }); }
 
-/* 이미지 압축 → Blob */
-function compressToBlob(file, max, q){
-  return new Promise((res,rej)=>{
-    const img=new Image(), url=URL.createObjectURL(file);
-    img.onload=()=>{
-      let {width:w,height:h}=img;
-      if(w>h && w>max){ h=Math.round(h*max/w); w=max; } else if(h>=w && h>max){ w=Math.round(w*max/h); h=max; }
-      const c=document.createElement("canvas"); c.width=w; c.height=h;
-      c.getContext("2d").drawImage(img,0,0,w,h);
-      URL.revokeObjectURL(url);
-      c.toBlob(b=> b?res(b):rej("noblob"), "image/jpeg", q);
-    };
-    img.onerror=()=>{ URL.revokeObjectURL(url); rej("imgerr"); };
-    img.src=url;
-  });
-}
-
-/* ---------- 기타 ---------- */
 function setSync(msg,kind){ const el=document.getElementById("syncStatus"); if(!el) return; el.textContent=msg||""; el.className="syncstatus"+(kind==="ok"?" ok":kind==="err"?" err":""); }
-function showModal(id){ document.getElementById(id).classList.add("show"); }
-function hideModal(id){ document.getElementById(id).classList.remove("show"); }
-let toastTimer;
-function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
+let toastTimer; function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
 
 /* ---------- 시작 ---------- */
-renderTabs();
+// 공유 링크로 메인 폴더 자동 설정:  ...baby-album.html?folder=폴더ID
+const _fp = location.search.match(/[?&]folder=([^&#]+)/);
+if(_fp){ try{ const fid=decodeURIComponent(_fp[1]).trim(); if(fid && fid!==localStorage.getItem(ROOT_KEY)){ localStorage.setItem(ROOT_KEY,fid); localStorage.removeItem(ALBUMID_KEY); } }catch(e){} }
+
 render();
-if(!curFolderId()) setSync("이 앨범 폴더가 아직 설정되지 않았어요 (코드에 폴더 ID 입력 필요)","err");
-else if(driveConnected()) restoreDrive();
-else if(driveConfigured()) setSync("'☁ 구글 연결'을 누르면 사진이 드라이브에 저장돼요");
+if(driveConnected()) restoreDrive();
+else if(driveConfigured()) setSync("구글 연결하면 앨범이 보여요 — '☁ 구글 연결'을 눌러주세요");
 else setSync("구글 연결은 안내서 설정 후 가능");
 </script>
 </body>
